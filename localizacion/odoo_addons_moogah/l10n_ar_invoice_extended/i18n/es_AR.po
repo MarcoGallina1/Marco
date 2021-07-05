@@ -1,0 +1,23 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* l10n_ar_invoice_extended
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 13.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-02-09 14:14+0000\n"
+"PO-Revision-Date: 2021-02-09 11:15-0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: es_AR\n"
+"X-Generator: Poedit 2.4.2\n"
+
+#. module: l10n_ar_invoice_extended
+#: model_terms:ir.ui.view,arch_db:l10n_ar_invoice_extended.view_invoice_tree_extended
+msgid "Open Val. Curr."
+msgstr "Val. Abierto Mon."

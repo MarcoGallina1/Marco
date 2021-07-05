@@ -1,0 +1,4 @@
+l10n_ar_api>=2.1.4
+xlwt
+simplejson
+python-dateutil==2.7.0

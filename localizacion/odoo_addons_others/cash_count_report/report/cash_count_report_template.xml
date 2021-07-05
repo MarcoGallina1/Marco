@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<odoo>
+
+    <template id="cash_count_report">
+        <t t-call="web.basic_layout">
+            <h5>Arqueo de caja - <span t-esc="payment_type"/></h5>
+            <h5 t-if="pos_ar">Punto de venta <span t-esc="pos_ar"/></h5>
+            <h5><span t-esc="company"/></h5>
+            <h5><span t-esc="date_from"/> - <span t-esc="date_to"/></h5>
+            <table class="table table-sm">
+                <t t-set="header_columns" t-value="payments.get_header()"/>
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th><span t-esc="partner_type"/></th>
+                        <th t-foreach="header_columns" t-as="column"><span t-esc="column.name"/></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="payments.get_cash_count_pdf_data(header_columns)" t-as="l">
+                        <td t-foreach="l" t-as="i"><span t-raw='i'/></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><b>Total</b></td>
+                        <td t-foreach="payments.get_totals_by_column(header_columns)" t-as="i">
+                            <b><span t-esc="payments._format_amount(i)"/></b>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </t>
+    </template>
+
+</odoo>
+
+<!-- vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4-->

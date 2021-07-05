@@ -1,0 +1,168 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* bi_odoo_project_phases
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 13.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-11-09 13:52+0000\n"
+"PO-Revision-Date: 2020-11-09 10:55-0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: es_AR\n"
+"X-Generator: Poedit 2.4.1\n"
+
+#. module: bi_odoo_project_phases
+#: model_terms:ir.ui.view,arch_db:bi_odoo_project_phases.project_task_phase_kanban
+msgid ""
+"<br/>\n"
+"                                        Project -"
+msgstr ""
+
+#. module: bi_odoo_project_phases
+#: model:ir.model.fields,field_description:bi_odoo_project_phases.field_project_task_phase__company_id
+msgid "Company"
+msgstr "Empresa"
+
+#. module: bi_odoo_project_phases
+#: model:ir.model.fields,field_description:bi_odoo_project_phases.field_project_task_phase__task_count
+msgid "Count"
+msgstr "Conteo"
+
+#. module: bi_odoo_project_phases
+#: model:ir.model.fields,field_description:bi_odoo_project_phases.field_project_task_phase__create_uid
+msgid "Created by"
+msgstr "Creado por"
+
+#. module: bi_odoo_project_phases
+#: model:ir.model.fields,field_description:bi_odoo_project_phases.field_project_task_phase__create_date
+msgid "Created on"
+msgstr "Creado en"
+
+#. module: bi_odoo_project_phases
+#: model:ir.model.fields,field_description:bi_odoo_project_phases.field_project_task_phase__display_name
+msgid "Display Name"
+msgstr "Nombre"
+
+#. module: bi_odoo_project_phases
+#: model:ir.model.fields,field_description:bi_odoo_project_phases.field_project_task_phase__end_date
+msgid "End Date"
+msgstr "Fecha de Fin"
+
+#. module: bi_odoo_project_phases
+#: model:ir.model.fields,field_description:bi_odoo_project_phases.field_project_task_phase__id
+msgid "ID"
+msgstr ""
+
+#. module: bi_odoo_project_phases
+#: model_terms:ir.ui.view,arch_db:bi_odoo_project_phases.task_phase_edit
+msgid "Internal Note"
+msgstr "Nota Interna"
+
+#. module: bi_odoo_project_phases
+#: model:ir.model.fields,field_description:bi_odoo_project_phases.field_project_project__project_phase_count
+msgid "Job Note"
+msgstr "Nota"
+
+#. module: bi_odoo_project_phases
+#: model:ir.model.fields,field_description:bi_odoo_project_phases.field_project_task_phase____last_update
+msgid "Last Modified on"
+msgstr "Ult. Modificación en"
+
+#. module: bi_odoo_project_phases
+#: model:ir.model.fields,field_description:bi_odoo_project_phases.field_project_task_phase__write_uid
+msgid "Last Updated by"
+msgstr "Ult. Actualización por"
+
+#. module: bi_odoo_project_phases
+#: model:ir.model.fields,field_description:bi_odoo_project_phases.field_project_task_phase__write_date
+msgid "Last Updated on"
+msgstr "Ult. Actualización en"
+
+#. module: bi_odoo_project_phases
+#: model:ir.model.fields,field_description:bi_odoo_project_phases.field_project_task_phase__notes
+msgid "Notes"
+msgstr "Notas"
+
+#. module: bi_odoo_project_phases
+#: model_terms:ir.ui.view,arch_db:bi_odoo_project_phases.view_task_search_form
+msgid "Phase"
+msgstr "Fase"
+
+#. module: bi_odoo_project_phases
+#: model:ir.model.fields,field_description:bi_odoo_project_phases.field_project_task_phase__name
+msgid "Phase Name"
+msgstr "Nombre de Fase"
+
+#. module: bi_odoo_project_phases
+#: model_terms:ir.ui.view,arch_db:bi_odoo_project_phases.task_phase_edit
+msgid "Phase..."
+msgstr "Fase..."
+
+#. module: bi_odoo_project_phases
+#: model_terms:ir.ui.view,arch_db:bi_odoo_project_phases.view_project_form_inherit
+msgid "Phases"
+msgstr "Fases"
+
+#. module: bi_odoo_project_phases
+#: model:ir.model,name:bi_odoo_project_phases.model_project_project
+#: model:ir.model.fields,field_description:bi_odoo_project_phases.field_project_task_phase__project_id
+msgid "Project"
+msgstr "Proyecto"
+
+#. module: bi_odoo_project_phases
+#: model:ir.model.fields,field_description:bi_odoo_project_phases.field_project_task__phase_id
+#: model:ir.model.fields,field_description:bi_odoo_project_phases.field_report_project_task_user__phase_id
+msgid "Project Phase"
+msgstr "Fase de Proyecto"
+
+#. module: bi_odoo_project_phases
+#: model:ir.actions.act_window,name:bi_odoo_project_phases.open_task_phase_form
+#: model:ir.ui.menu,name:bi_odoo_project_phases.menu_project_phases
+#: model:ir.ui.menu,name:bi_odoo_project_phases.menu_task_phases_view
+#: model_terms:ir.ui.view,arch_db:bi_odoo_project_phases.task_phase_search
+msgid "Project Phases"
+msgstr "Fases de Proyecto"
+
+#. module: bi_odoo_project_phases
+#: model:ir.model.fields,field_description:bi_odoo_project_phases.field_project_task_phase__user_id
+msgid "Responsible User"
+msgstr "Usuario Responsable"
+
+#. module: bi_odoo_project_phases
+#: model:ir.model.fields,field_description:bi_odoo_project_phases.field_project_task_phase__sequence
+msgid "Sequence"
+msgstr "Secuencia"
+
+#. module: bi_odoo_project_phases
+#: model:ir.model.fields,field_description:bi_odoo_project_phases.field_project_task_phase__start_date
+msgid "Start Date"
+msgstr "Fecha de Inicio"
+
+#. module: bi_odoo_project_phases
+#: model:ir.model,name:bi_odoo_project_phases.model_project_task
+msgid "Task"
+msgstr "Tarea"
+
+#. module: bi_odoo_project_phases
+#: model:ir.model,name:bi_odoo_project_phases.model_project_task_phase
+#: model_terms:ir.ui.view,arch_db:bi_odoo_project_phases.task_phase_edit
+#: model_terms:ir.ui.view,arch_db:bi_odoo_project_phases.task_phase_tree
+msgid "Task Phase"
+msgstr "Fase de Tarea"
+
+#. module: bi_odoo_project_phases
+#: model_terms:ir.ui.view,arch_db:bi_odoo_project_phases.project_task_phase_kanban
+#: model_terms:ir.ui.view,arch_db:bi_odoo_project_phases.task_phase_edit
+msgid "Tasks"
+msgstr "Tareas"
+
+#. module: bi_odoo_project_phases
+#: model:ir.model,name:bi_odoo_project_phases.model_report_project_task_user
+msgid "Tasks Analysis"
+msgstr "Análisis Tareas"

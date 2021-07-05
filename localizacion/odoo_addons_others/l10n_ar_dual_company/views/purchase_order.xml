@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<odoo>
+
+    <record model="ir.ui.view" id="purchase_order_form_view">
+        <field name="name">purchase_order_form_view</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase_stock.purchase_order_view_form_inherit"/>
+        <field name="arch" type="xml">
+            <field name="picking_type_id" position="replace"/>
+            <field name="company_id" position="after">
+                <field name="picking_type_id" domain="[('code','=','incoming')]" options="{'no_create': True}" groups="stock.group_stock_multi_locations"/>
+            </field>
+            <button id="bid_confirm" position="before">
+                <field name="company_parent_id" invisible="1"/>
+                <button name="button_confirm_new" type="object" id="bid_confirm_new" class="oe_highlight" string="Confirmar orden" attrs="{'invisible': ['|', ('state', '!=', 'sent'), ('company_parent_id', '!=', False)]}"/>
+                <button name="button_confirm_new" type="object" id="draft_confirm_new" string="Confirmar orden" attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('company_parent_id', '!=', False)]}"/>
+            </button>
+            <button id="bid_confirm" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('state', '!=', 'sent'), ('company_parent_id', '=', False)]}</attribute>
+                <attribute name="states"/>
+            </button>
+            <button id="draft_confirm" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('state', '!=', 'draft'), ('company_parent_id', '=', False)]}</attribute>
+                <attribute name="states"/>
+            </button>
+        </field>
+    </record>
+
+</odoo>
+
+<!-- vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4-->

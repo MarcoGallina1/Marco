@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="retrieve_cae_wizard_view_form" model="ir.ui.view">
+        <field name="name">retrieve.cae.wizard.view.form</field>
+        <field name="model">cae.retrieve.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="document_type_id"/>
+                            <field name="pos_nr_id"/>
+                        </group>
+                        <group>
+                            <field name="inv_number"/>
+                            <field name="move_id"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_retrieve_cae" string="Retrieve CAE" type="object" class="oe_highlight"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+    <record model="ir.actions.act_window" id="retrieve_cae_wizard_action">
+        <field name="name">Retrieve CAE</field>
+        <field name="res_model">cae.retrieve.wizard</field>
+        <field name="view_mode">form</field>
+    </record>
+
+   <act_window
+        name="Retrieve CAE"
+        id="retrieve_cae_action"
+        binding_model="account.move"
+        res_model="cae.retrieve.wizard"
+        view_mode="form"
+        target="new"
+        context="{'default_move_id': active_id}"
+        groups="account.group_account_invoice"/>
+
+</odoo>

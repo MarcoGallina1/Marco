@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    	<record model="ir.ui.view" id="account_earciba_form">
+            <field name="name">account.earciba.form</field>
+            <field name="model">earciba.files</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="name" placeholder="Nombre"/></h1>
+                            <label for="company_id" class="oe_edit_only" groups="base.group_multi_company"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="date_from"/>
+                                <field name="date_to"/>
+                            </group>
+                            <group>
+                                <field name="percep_tax_code_ids" widget="many2many_tags"/>
+                                <field name="with_tax_code_ids" widget="many2many_tags"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="generation_time" readonly="1" attrs="{'invisible':[('generation_time', '=', False)]}"/>
+                            <button name="generate_files"
+                                    type="object"
+                                    string="Generar"
+                                    icon="fa-gear"
+                                    colspan="1"
+                            />
+                        </group>
+                        <group string="Archivos">
+                            <field name="earciba_wh_perc" filename="earciba_wh_perc_name"/>
+                            <field name="earciba_wh_perc_name" invisible="True"/>
+                            <field name="earciba_cred_motes" filename="earciba_cred_notes_name"/>
+                            <field name="earciba_cred_notes_name" invisible="True"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="account_earciba_tree">
+            <field name="name">account.earciba.tree</field>
+            <field name="model">earciba.files</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_account_earciba" model="ir.actions.act_window">
+            <field name="name">Libro eArciba</field>
+            <field name="res_model">earciba.files</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+            id="account_invoice_earciba_menu"
+            name="Libro eArciba"
+            action="action_account_earciba"
+            parent="account.menu_finance_reports"
+            sequence="15"
+        />
+
+</odoo>

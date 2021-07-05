@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<odoo>
+
+    <report
+        id="cash_count_report_action"
+        model="account.payment"
+        string="Arqueo de caja"
+        report_type="qweb-pdf"
+        file="cash_count_report.cash_count_report"
+        name="cash_count_report.cash_count_report"
+        menu="False"
+    />
+
+    <record id="cash_count_report_format" model="report.paperformat">
+        <field name="name">Papel arqueo</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">10</field>
+        <field name="header_spacing">0</field>
+    </record>
+
+    <record id="cash_count_report_action" model="ir.actions.report">
+        <field name="paperformat_id" ref="cash_count_report_format"/>
+    </record>
+
+</odoo>
+
+<!-- vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4-->
