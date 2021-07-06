@@ -16,7 +16,7 @@
 #
 ##############################################################################
 
-from odoo import models, fields, api
+from odoo import models, fields
 
 
 class StockPicking(models.Model):
@@ -25,13 +25,6 @@ class StockPicking(models.Model):
     location_dest_id = fields.Many2one(check_company=False)
     location_id = fields.Many2one(check_company=False)
     backorder_id = fields.Many2one(check_company=False)
-
-    @api.returns('self', lambda value: value.id)
-    def copy(self, default=None):
-        self.ensure_one()
-        res = super(StockPicking, self).copy(default=default)
-        res.company_id = self.company_id
-        return res
 
     def _create_backorder(self):
         """ Heredo la funcion de generar remito de entrega parcial

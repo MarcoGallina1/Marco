@@ -32,7 +32,7 @@ class ResPartner(models.Model):
     def compute_partner_street(self):
         for rec in self:
             if rec.custom_street:
-                street_list = [rec.custom_street or '', rec.street_number or '', rec.flat or '', rec.department or '', rec.street2 or '']
+                street_list = [rec.custom_street or '', rec.street_number or '', rec.flat or '', rec.department or '']
                 rec.street = ' '.join(filter(None, street_list))
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

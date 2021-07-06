@@ -20,7 +20,7 @@
 
     'name': 'L10n ar padron IIBB CABA',
 
-    'version': '1.1.0',
+    'version': '1.0',
 
     'category': '',
 

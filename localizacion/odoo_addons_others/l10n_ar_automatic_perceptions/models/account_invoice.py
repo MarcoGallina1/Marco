@@ -69,10 +69,7 @@ class AccountInvoice(models.Model):  # Se encarga de cargar las percepciones en 
 
     @api.onchange('partner_id', 'jurisdiction_id', 'partner_shipping_id', 'currency_id', 'currency_rate')
     def _onchange_partner_id(self):
-        if self.state == 'draft':
-            if not self.jurisdiction_id:
-                self.jurisdiction_id = self.partner_shipping_id.state_id or self.partner_id.state_id
-            self.onchange_invoice_line_perception()
+        self.onchange_invoice_line_perception()
         return super(AccountInvoice, self)._onchange_partner_id()
 
     def _get_untaxed_product_amounts(self):

@@ -21,7 +21,7 @@
 
     'name': 'l10n account check',
 
-    'version': '1.1.2',
+    'version': '1.1.1',
 
     'summary': 'Cheques propios y de terceros',
 

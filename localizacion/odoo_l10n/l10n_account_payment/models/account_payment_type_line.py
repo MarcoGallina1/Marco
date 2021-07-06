@@ -22,7 +22,6 @@ from odoo import models, fields
 class AccountPaymentTypeLine(models.Model):
     _name = 'account.payment.type.line'
     _inherit = 'account.abstract.payment.line'
-    _description = 'Líneas de método de pago'
 
     name = fields.Char(string="Concepto")
     journal_id = fields.Many2one(

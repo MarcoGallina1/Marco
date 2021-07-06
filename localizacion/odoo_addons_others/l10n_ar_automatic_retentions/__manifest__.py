@@ -33,7 +33,6 @@
     'depends': [
         'l10n_ar_retentions_advance',
         'payment_imputation',
-        'l10n_ar_afip_tables',
     ],
 
     'data': [

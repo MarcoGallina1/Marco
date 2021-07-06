@@ -15,10 +15,11 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
+from datetime import datetime
 
 from l10n_ar_api.presentations import presentation
 from odoo import models, fields
-from odoo.exceptions import ValidationError
+from odoo.exceptions import Warning
 
 
 class RetentionSifere(models.Model):
@@ -40,14 +41,10 @@ class RetentionSifere(models.Model):
         line.jurisdiccion = code
         vat = r.payment_id.partner_id.vat
         line.cuit = "{0}-{1}-{2}".format(vat[0:2], vat[2:10], vat[-1:])
-        line.fecha = r.date.strftime('%d/%m/%Y')
-        line.puntoDeVenta = r.payment_id.journal_id.pos_ar_id.name[-4:]
-        line.numeroComprobante = ''.join([s for s in str(r.certificate_no) if s.isdigit()])[-16:]
-        base_number = str(r.payment_id.name.split('-')[1] if '-' in str(r.payment_id.name) else r.payment_id.name)[:20]
-        if not base_number.isdigit():
-            msg = "La orden de pago {} contiene caracteres inválidos (solamente se permiten números y guiones)"
-            raise ValidationError(msg.format(p.payment_id.name))
-        line.numeroBase = base_number
+        line.fecha = r.payment_id.payment_date.strftime('%d/%m/%Y')
+        line.puntoDeVenta = r.payment_id.journal_id.pos_ar_id.name
+        line.numeroComprobante = ''.join([s for s in str(r.certificate_no) if s.isdigit()])
+        line.numeroBase = ''.join([s for s in str(r.payment_id.name.split('-')[1]) if s.isdigit()])
         line.tipo = "R"
         line.letra = " "
         line.importe = '{0:.2f}'.format(r.amount).replace('.', ',')
@@ -55,8 +52,8 @@ class RetentionSifere(models.Model):
     def generate_file(self):
         lines = presentation.Presentation("sifere", "retenciones")
         retentions = self.env['account.payment.retention'].search([
-            ('date', '>=', self.date_from),
-            ('date', '<=', self.date_to),
+            ('payment_id.payment_date', '>=', self.date_from),
+            ('payment_id.payment_date', '<=', self.date_to),
             ('retention_id.type', '=', 'gross_income'),
             ('payment_id.state', 'in', ['posted', 'reconciled']),
             ('payment_id.payment_type', '=', 'inbound'),
@@ -67,10 +64,10 @@ class RetentionSifere(models.Model):
         invalid_doctypes = set()
         invalid_vats = set()
         missing_codes = set()
-        missing_pos_ar = set()
 
         for r in retentions:
             code = self.get_code(r)
+
             vat = r.payment_id.partner_id.vat
             if not vat:
                 missing_vats.add(r.payment_id.name_get()[0][1])
@@ -80,21 +77,14 @@ class RetentionSifere(models.Model):
                 invalid_doctypes.add(r.payment_id.name_get()[0][1])
             if not code:
                 missing_codes.add(r.retention_id.state_id.name)
-            if not r.payment_id.journal_id.pos_ar_id:
-                missing_pos_ar.add(r.payment_id.journal_id.name)
 
             # si ya encontro algun error, que no siga con el resto del loop porque el archivo no va a salir
             # pero que siga revisando las retenciones por si hay mas errores, para mostrarlos todos juntos
-            if missing_vats or invalid_doctypes or invalid_vats or missing_codes or missing_pos_ar:
+            if missing_vats or invalid_doctypes or invalid_vats or missing_codes:
                 continue
-            try:
-                self.create_line(code, lines, r)
-            except ValidationError as e:
-                raise e
-            except Exception as e:
-                raise ValidationError(e)
+            self.create_line(code, lines, r)
 
-        if missing_vats or invalid_doctypes or invalid_vats or missing_codes or missing_pos_ar:
+        if missing_vats or invalid_doctypes or invalid_vats or missing_codes:
             errors = []
             if missing_vats:
                 errors.append("Los partners de los siguientes pagos no poseen numero de CUIT:")
@@ -108,10 +98,7 @@ class RetentionSifere(models.Model):
             if missing_codes:
                 errors.append("Las siguientes jurisdicciones no poseen codigo:")
                 errors.extend(missing_codes)
-            if missing_pos_ar:
-                errors.append("Los siguientes diarios no poseen punto de venta:")
-                errors.extend(missing_pos_ar)
-            raise ValidationError("\n".join(errors))
+            raise Warning("\n".join(errors))
 
         else:
             self.file = lines.get_encoded_string()

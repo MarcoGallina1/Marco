@@ -50,7 +50,7 @@ class CreditCardCouponReconcileAbstractLine(models.AbstractModel):
 
     @api.constrains('amount')
     def check_negative_amounts(self):
-        if any(r.amount < 0 for r in self):
-            raise ValidationError("Monto no puede ser negativo.")
+        if any(r.amount <= 0 for r in self):
+            raise ValidationError("Monto tiene que ser estrictamente positivo.")
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

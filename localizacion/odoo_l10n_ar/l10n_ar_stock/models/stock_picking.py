@@ -30,10 +30,6 @@ class StockPicking(models.Model):
         copy=False
     )
 
-    def update_move_names(self):
-        self.ensure_one()
-        self.env['stock.move'].search([('picking_id', '=', self.id)]).write({'reference': self.name})
-
     def set_picking_number(self, document_book):
         self.ensure_one()
         if not self.voucher_name:
@@ -46,7 +42,6 @@ class StockPicking(models.Model):
             self.voucher_name
         )
         self.name = picking_name
-        self.update_move_names()
 
     def action_done(self):
         res = super(StockPicking, self).action_done()

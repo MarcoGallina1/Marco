@@ -39,16 +39,13 @@ Modulo encargado de instalar todos los modulos requeridos para la localizacion A
         'l10n_ar_account_check_collect',
         'l10n_ar_account_check_sale',
         'l10n_ar_account_payment_report',
-        'l10n_ar_afip_import_documents',
         'l10n_ar_check_location',
-        'l10n_ar_general_ledger',
         'l10n_ar_electronic_invoice_report',
         'l10n_ar_perceptions',
         'l10n_ar_sale',
         'l10n_ar_stock_picking_report',
         'l10n_ar_vat_diary',
         'l10n_credit_cards',
-        'l10n_payment_global_currency_rate',
     ],
 
     'data': [

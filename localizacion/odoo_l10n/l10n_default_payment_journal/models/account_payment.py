@@ -22,20 +22,13 @@ from odoo import models, fields, api
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
-    def get_default_payment_journal(self):
-        journal_id = self.env['res.company'].browse(
-            self._context.get('force_company', self.env.company.id)
-        ).default_payment_journal_id.id
-        return journal_id
-
-    journal_id = fields.Many2one(default=get_default_payment_journal)
+    journal_id = fields.Many2one(default=lambda l: l.env.company.default_payment_journal_id)
 
     def action_register_payment(self):
         """ Al abrir la ventana para registrar pagos, hago que el diario por defecto sea el definido en la compañía """
         res = super(AccountPayment, self).action_register_payment()
         new_context = res['context'].copy()
-        new_context.update({'default_journal_id': self.get_default_payment_journal()})
-        res['context'] = new_context
+        res['context'] = new_context.update({'default_journal_id': self.env.company.default_payment_journal_id.id})
         return res
 
     @api.onchange('amount', 'currency_id')

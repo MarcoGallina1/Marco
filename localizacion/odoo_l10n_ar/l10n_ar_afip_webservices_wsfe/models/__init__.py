@@ -20,9 +20,7 @@ from . import account_move
 from . import document_book
 from . import document_book_type
 from . import fce_associated_document
-from . import ncm_types
 from . import perception_perception
-from . import product_product
 from . import res_currency
 from . import wsfe_configuration
 from . import wsfe_request_detail

@@ -61,10 +61,6 @@ class RetentionSicore(models.Model):  # Validacion de campos
     def validate_fields(self, retention):
         """ Validaciones de campos necesarios para la generacion del archivo"""
         errors = []
-        if not retention.payment_id.voucher_name:
-            errors.append("La orden de pago {} no posee un número válido para su presentación en SICORE".format(
-                retention.payment_id.name)
-            )
         if not retention.payment_id.partner_id.vat:
             errors.append('Falta el numero de documento para el partner "{}" de la retencion: {}'.format(
                 retention.payment_id.partner_id.name, retention.certificate_no)
@@ -97,8 +93,8 @@ class RetentionSicoreSearch(models.Model):  # Busqueda de retenciones para archi
     def search_retentions(self):
         """ Busco las retenciones de los pagos validados de proveedor en un rango de fechas"""
         retentions = self.env['account.payment.retention'].search([
-            ('date', '>=', self.date_from),
-            ('date', '<=', self.date_to),
+            ('payment_id.payment_date', '>=', self.date_from),
+            ('payment_id.payment_date', '<=', self.date_to),
             ('type', 'in', ('profit', 'vat')),
             ('payment_id.state', 'in', ['posted', 'reconciled']),
             ('payment_id.payment_type', '=', 'outbound'),
@@ -178,7 +174,7 @@ class RetentionSicoreCreateLine(models.Model):  # Creacion de linea de archivo
         line.codigoRegimen = str(r.activity_id.code).zfill(3)
         line.codigoOperacion = '1'  # 1 Retención, 2 Percepción, 4 Imposibilidad de Retención
         line.base = '{0:.2f}'.format(r.base).zfill(14).replace('.', ',')
-        line.fecha = r.date.strftime('%d/%m/%Y')
+        line.fecha = r.payment_id.payment_date.strftime('%d/%m/%Y')
         line.codigoCondicion = self.get_condition_code()
         line.retencionPracticadaSS = '0'
         line.importe = '{0:.2f}'.format(r.amount).zfill(14).replace('.', ',')
@@ -200,12 +196,7 @@ class RetentionSicoreFile(models.Model):  # Generacion de archivo
             errors = self.validate_fields(r)
             if errors:
                 continue
-            try:
-                self.create_line(lines, r)
-            except ValidationError as e:
-                raise e
-            except Exception as e:
-                raise ValidationError(e)
+            self.create_line(lines, r)
         if errors:
             raise ValidationError("\n".join(errors))
         else:

@@ -16,8 +16,6 @@
 #
 ##############################################################################
 
-from l10n_ar_api.afip_webservices.wsfe.wsfe import WsfeAssociatedDocument
-
 from odoo import models, fields, api
 
 
@@ -57,14 +55,5 @@ class FceAssociatedDocument(models.Model):
             'date': self.associated_invoice_id.invoice_date,
             'canceled': self.associated_invoice_id.fce_rejected,
         })
-    
-    def create_wsfe_associated_document(self):
-        return WsfeAssociatedDocument(
-            self.document_code,
-            self.point_of_sale,
-            self.document_number,
-            self.cuit_transmitter,
-            self.date
-        )
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

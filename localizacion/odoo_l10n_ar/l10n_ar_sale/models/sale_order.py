@@ -30,16 +30,6 @@ class SaleOrder(models.Model):
             invoices.update({'jurisdiction_id': order.partner_shipping_id.state_id or order.partner_id.state_id})
         for invoice in invoices:
             invoice._onchange_partner_id()
-            # En _onchange_partner_id se resetean las notas de la factura según
-            # los términos y condiciones de la configuración general de facturación.
-            # Pero el caso de uso de tal función es si el usuario manualmente cambiara
-            # el cliente por lo que volvemos a setear las notas con la nota de la venta
-            sale_order = invoice.line_ids.sale_line_ids.order_id
-            # Solo se tiene en cuenta aquellas facturas que se hacen sobre una sola venta
-            # Ya que de forma estándar cuando se agrupan facturas no tiene en cuenta la nota
-            # como un dato a actualizar
-            if len(sale_order) == 1:
-                invoice.narration = sale_order.note
         return invoices
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

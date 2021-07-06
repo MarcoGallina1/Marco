@@ -20,7 +20,7 @@
 
     'name': 'l10n_ar_account_payment_report',
 
-    'version': '1.0.1',
+    'version': '1.0',
 
     'description': 'Reporte de Pagos',
 

@@ -83,7 +83,7 @@
                             attrs="{'readonly': [('state', '!=', 'draft')]}"
                             options="{'no_create': True}"
                             domain="[('state', '=', 'wallet'), ('destination_payment_id', '=', False),
-                                     ('not_to_order', '=', False), ('company_id', '=', company_id)]"
+                                     ('not_to_order', '=', False)]"
                             context="{'payment_currency': currency_id}"
                             widget="many2many">
                         <tree editable="bottom">

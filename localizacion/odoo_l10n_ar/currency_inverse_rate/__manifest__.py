@@ -20,7 +20,7 @@
 
     'name': 'Currency inverse rate',
 
-    'version': '1.0.1',
+    'version': '1.0',
 
     'category': 'base',
 

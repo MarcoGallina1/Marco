@@ -22,7 +22,7 @@
             <field name="model">res.currency</field>
             <field name="inherit_id" ref="base.view_currency_form"/>
             <field name="arch" type="xml">
-                <field name="rate" position="after">
+                <field name="position" position="after">
                     <field name="editable_inverse_rate"/>
                 </field>
             </field>

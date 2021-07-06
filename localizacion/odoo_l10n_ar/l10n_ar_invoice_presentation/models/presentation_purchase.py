@@ -53,10 +53,10 @@ class PurchaseInvoicePresentation(PurchasePresentation):
         line.importeTotal = self.get_importeTotal(invoice)
         line.importeTotalNG = self.get_importeTotalNG_purchase(invoice)
         line.importeOpExentas = self.get_importeOpExentas(invoice)
-        line.importePerOIva = self.get_importe_per_by_type(invoice, ['vat'])
-        line.importePerOtrosImp = self.get_importe_per_by_type(invoice, ['profit', 'other'])
-        line.importePerIIBB = self.get_importe_per_by_type(invoice, ['gross_income'])
-        line.importePerIM = self.get_importe_per_by_jurisdiction(invoice, ['municipal'])
+        line.importePerOIva = self.get_importe_per_by_type(invoice, 'vat')
+        line.importePerOtrosImp = self.get_importe_per_by_type(invoice, 'other')
+        line.importePerIIBB = self.get_importe_per_by_type(invoice, 'gross_income')
+        line.importePerIM = self.get_importe_per_by_jurisdiction(invoice, 'municipal')
         line.importeImpInt = self.get_importeImpInt(invoice)
         line.codigoMoneda = self.get_codigoMoneda(invoice)
         line.tipoCambio = self.get_tipoCambio()
@@ -75,7 +75,7 @@ class PurchaseInvoicePresentation(PurchasePresentation):
         """
         Devuelve el monto total de importes de operaciones exentas.
         :param invoice: record.
-        :return: string, monto ej: 23.00-> '2300'
+        :return: string, monto ej: 23.00-> '2300' 
         """
         if invoice.voucher_type_id.denomination_id in [self.data.type_b, self.data.type_c]:
             return '0'
@@ -105,7 +105,7 @@ class PurchaseInvoicePresentation(PurchasePresentation):
 
         # Si es sin prorrateo , se devuelve el total de impuestos liquidado
         if not self.with_prorate:
-            return self.helper.format_amount(invoice.amount_tax)
+            return self.helper.format_amount(invoice.amount_tax * self.rate)
         # Sino se devuelve el monto de los impuestos de iva
         else:
             vat_tax_amount = sum(
@@ -113,7 +113,7 @@ class PurchaseInvoicePresentation(PurchasePresentation):
                     lambda t: t.tax_line_id.is_vat and t.tax_line_id != self.data.tax_purchase_ng and not t.tax_line_id.is_exempt
                 ).mapped('price_subtotal')
             )
-            return self.helper.format_amount(vat_tax_amount)
+            return self.helper.format_amount(vat_tax_amount * self.rate)
 
     # No implementado
     @staticmethod

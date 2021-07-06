@@ -25,6 +25,5 @@ class StockMoveLine(models.Model):
     location_dest_id = fields.Many2one(check_company=False)
     location_id = fields.Many2one(check_company=False)
     picking_id = fields.Many2one(check_company=False)
-    move_id = fields.Many2one(check_company=False)
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

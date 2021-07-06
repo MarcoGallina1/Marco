@@ -20,7 +20,7 @@
 
     'name': 'L10n ar credit card coupon reconcile',
 
-    'version': '1.3.0',
+    'version': '1.1',
 
     'category': 'Accounting',
 

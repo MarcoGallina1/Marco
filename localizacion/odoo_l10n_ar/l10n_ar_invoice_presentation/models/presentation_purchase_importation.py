@@ -29,7 +29,7 @@ class PurchaseImportationPresentation(PurchaseVatPresentation):
         """
         return invoices.filtered(
             lambda i: i.type in ['in_invoice', 'in_refund']
-                      and i.voucher_type_id.is_importation_forward and i.importation_forward_number
+                      and i.voucher_type_id.denomination_id in [self.data.type_d]
         )
 
     def create_line(self, invoice):
@@ -45,8 +45,8 @@ class PurchaseImportationPresentation(PurchaseVatPresentation):
             importation_line = self.builder.create_line()
 
             importation_line.despachoImportacion = self.get_despachoImportacion(invoice)
-            importation_line.importeNetoGravado = self.get_importeNetoGravado(invoice, tax)
+            importation_line.importeNetoGravado = self.get_importeNetoGravado(tax)
             importation_line.alicuotaIva = self.get_alicuotaIva(tax)
-            importation_line.impuestoLiquidado = self.helper.format_amount(tax.price_subtotal)
+            importation_line.impuestoLiquidado = self.helper.format_amount(self.rate * tax.price_subtotal)
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

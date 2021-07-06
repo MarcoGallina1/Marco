@@ -26,7 +26,6 @@ class DocumentBookType(models.Model):
     type = fields.Selection(selection_add=[
         ('electronic', 'Electronico'),
         ('electronic_exportation', 'Electronico exp.'),
-        ('fiscal_electronic_bond', 'Bono Fiscal Electrónico')
     ])
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

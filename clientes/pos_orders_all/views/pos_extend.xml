@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<record model="ir.ui.view" id="custom_bi_pos_import_sale_view">
+		<field name="name">pos.config.form.extended.view</field>
+		<field name="model">pos.config</field>
+		<field name="inherit_id" ref="point_of_sale.view_pos_config_form"/>
+		<field name="arch" type="xml">
+			<xpath expr="//field[@name='journal_ids']" position="after">
+				<group string="Import Configuration in POS" >
+					<field name="check" /> 
+					<field name="import_whole_sale"/>    
+				</group>
+			</xpath>
+			
+		</field>
+		</record>
+	</data>
+</odoo>

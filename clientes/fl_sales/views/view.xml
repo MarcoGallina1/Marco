@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_inherited" model="ir.ui.view">
+        <field name="name">view.order.form.inherited</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
+        <field name="arch" type="xml">
+            <field name="warehouse_id" position="before">
+                <field name="fl_picking_status"/>
+            </field>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="view_sale_order_kanban">
+        <field name="name">sale.order.kanban</field>
+        <field name="model">sale.order</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name"/>
+                <field name="fl_picking_status"/>
+                <field name="partner_id"/>
+                <field name="amount_total"/>
+                <field name="date_order"/>
+                <field name="state"/>
+                <field name="currency_id"/>
+                <field name="activity_state"/>
+                <progressbar field="activity_state" colors='{"planned": "success", "today": "warning", "overdue": "danger"}'/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_record_top mb16">
+                                <div class="o_kanban_record_headings mt4">
+                                    <strong class="o_kanban_record_title"><span><t t-esc="record.partner_id.value"/></span></strong>
+                                </div>
+                                <strong><field name="amount_total" widget="monetary"/></strong>
+                            </div>
+                            <div>
+                                <field name="get_items"/>
+                            </div>
+                            <div class="o_kanban_record_top mt16">
+                                <div class="o_kanban_record_headings mt4">
+                                    <a type="object" name="action_chg">
+                                        <span t-if="record.fl_picking_status.raw_value==false">Pending</span>
+                                        <span t-if="record.fl_picking_status.raw_value=='pending'">ready</span>
+                                        <span t-if="record.fl_picking_status.raw_value=='ready'">Delivered</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div>
+                                <strong style="color: yellow;" t-if="record.fl_picking_status.raw_value==false">
+                                    <span>Pending</span>
+                                </strong>
+                                <strong style="color: yellow;" t-if="record.fl_picking_status.raw_value=='pending'">
+                                    <field name="fl_picking_status"/>
+                                </strong>
+                                <strong style="color: green;" t-if="record.fl_picking_status.raw_value=='ready'">
+                                    <field name="fl_picking_status"/>
+                                </strong>
+                                <strong style="color: black;" t-if="record.fl_picking_status.raw_value=='delivered'">
+                                    <field name="fl_picking_status"/>
+                                </strong>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left text-muted">
+                                    <span><t t-esc="record.name.value"/> <t t-esc="record.date_order.value"/></span>
+                                    <field name="activity_ids" widget="kanban_activity"/>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="fl_picking_status" widget="label_selection" options="{'classes': {'pengind': 'default', 'ready': 'default', 'delivered': 'success'}}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_fresca_dispatch">
+        <field name="name">Dispatchs</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="usage">Dispatchs</field>
+        <field name="view_id" ref="view_sale_order_kanban"/>
+    </record>
+
+    <menuitem name="Fresca" id="menu_fresca_root" sequence="30"/>
+
+    <menuitem id="menu_fresca_management" name="Operations" parent="menu_fresca_root"
+              sequence="2"/>
+
+    <menuitem id="menu_item_fresca_dispatch"
+              name="Dispatchs"
+              parent="menu_fresca_management"
+              sequence="1" action="action_fresca_dispatch"/>
+
+    <record id="filter_order_by_fresca" model="ir.filters">
+        <field name="name">By State</field>
+        <field name="model_id">sale.order</field>
+        <field name="domain">[]</field>
+        <field name="user_id" eval="False"/>
+        <field name="context">{'group_by': 'fl_picking_status'}</field>
+    </record>
+</odoo>

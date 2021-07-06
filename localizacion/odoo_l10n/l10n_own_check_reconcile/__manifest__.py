@@ -20,7 +20,7 @@
 
     'name': 'Own Check Reconcile',
 
-    'version': '1.0.2',
+    'version': '1.0.1',
 
     'category': '',
 

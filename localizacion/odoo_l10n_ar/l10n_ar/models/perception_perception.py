@@ -26,29 +26,18 @@ class PerceptionPerception(models.Model):
     _description = 'Percepción'
 
     def get_perception_groups(self):
-        return self.get_perception_gross_income_groups() |\
+        return self.get_perception_iibb_groups() |\
                self.get_perception_vat_groups() |\
                self.get_perception_profit_groups()
 
-    def get_perception_gross_income_groups(self):
-        return self.env['perception.perception'].search([
-            ('type', '=', 'gross_income')
-        ]).mapped('tax_id.tax_group_id')
+    def get_perception_iibb_groups(self):
+        return self.env.ref('l10n_ar.tax_group_perception_iibb_caba', None) | \
+               self.env.ref('l10n_ar.tax_group_perception_iibb_pba', None)
 
     def get_perception_vat_groups(self):
-        return self.env['perception.perception'].search([
-            ('type', '=', 'vat')
-        ]).mapped('tax_id.tax_group_id')
+        return self.env.ref('l10n_ar.tax_group_perception_vat', None)
 
     def get_perception_profit_groups(self):
-        return self.env['perception.perception'].search([
-            ('type', '=', 'profit')
-        ]).mapped('tax_id.tax_group_id')
-
-    def get_perception_other_groups(self):
-        return self.env['perception.perception'].search([
-            ('type', '=', 'other')
-        ]).mapped('tax_id.tax_group_id')
-
+        return self.env.ref('l10n_ar.tax_group_perception_profit', None)
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

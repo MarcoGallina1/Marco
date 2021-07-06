@@ -20,7 +20,7 @@
 
     'name': 'l10n_ar_retentions_sicore',
 
-    'version': '1.0.1',
+    'version': '1.0',
 
     'category': '',
 

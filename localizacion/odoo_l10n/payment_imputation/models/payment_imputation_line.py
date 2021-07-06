@@ -74,7 +74,7 @@ class AbstractAccountPaymentImputationLine(models.AbstractModel):
 
     payment_id = fields.Many2one('account.payment')
     name = fields.Char('Nombre', compute='_compute_name')
-    move_line_id = fields.Many2one('account.move.line', 'Documento')
+    move_line_id = fields.Many2one('account.move.line', 'Documento', ondelete="restrict")
     move_line_date = fields.Date('Fecha', related='move_line_id.date')
     move_line_date_maturity = fields.Date('Fecha de vencimiento', related='move_line_id.date_maturity')
     currency_id = fields.Many2one('res.currency', compute='_compute_currency_id')
@@ -147,6 +147,5 @@ class PaymentImputationLine(models.Model):
 
     payment_id = fields.Many2one('account.payment', 'Pago', ondelete='cascade')
     payment_state = fields.Selection(related='payment_id.state')
-    move_line_id = fields.Many2one(ondelete="restrict")
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

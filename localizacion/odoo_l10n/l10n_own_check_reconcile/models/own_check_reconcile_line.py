@@ -51,8 +51,7 @@ class OwnCheckReconcileLine(models.Model):
     )
 
     currency_id = fields.Many2one(
-        comodel_name='res.currency',
-        string="Moneda"
+        string="Moneda",
     )
 
     company_id = fields.Many2one(

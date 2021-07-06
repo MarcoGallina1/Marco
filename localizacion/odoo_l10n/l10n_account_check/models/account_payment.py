@@ -46,8 +46,8 @@ class AccountPayment(models.Model):
     check_issue_date = fields.Date(compute='compute_check_issue_date')
 
     def unlink(self):
-        """ Heredo el método unlink() ya que al eliminar un pago,
-        si no se define explícitamente eliminar las líneas también
+        """ Heredo el método unlink() ya que al eliminar un pago, 
+        si no se define explícitamente eliminar las líneas también 
         Odoo intentará poner NULL en todos los campos de las líneas,
         generando errores por constraint not null """
         for payment in self:
@@ -58,7 +58,7 @@ class AccountPayment(models.Model):
                 payment.account_third_check_sent_ids = None
         return super(AccountPayment, self).unlink()
 
-    @api.onchange('account_third_check_ids', 'account_own_check_ids')
+    @api.onchange('account_third_check_ids', 'account_third_check_sent_ids', 'account_own_check_ids')
     def onchange_check_ids(self):
         self.recalculate_payment_amount()
 
@@ -75,7 +75,6 @@ class AccountPayment(models.Model):
                 self.currency_id, orig_check.currency_id, self.company_id, self.payment_date)
             r.sent_rate = rate
             r.onchange_sent_rate()
-        self.recalculate_payment_amount()
 
     def get_payment_line_fields(self):
         res = super(AccountPayment, self).get_payment_line_fields()

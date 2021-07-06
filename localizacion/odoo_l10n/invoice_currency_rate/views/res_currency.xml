@@ -21,9 +21,9 @@
         <field name="model">res.currency</field>
         <field name="inherit_id" ref="base.view_currency_form"/>
         <field name="arch" type="xml">
-            <field name="currency_subunit_label" position="after">
+            <xpath expr="//field[@name='position']" position="after">
                 <field name="need_rate"/>
-            </field>
+            </xpath>
         </field>
     </record>
 

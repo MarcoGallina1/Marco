@@ -11,7 +11,6 @@ class ProductSupplierinfo(models.Model):
         'Sale Margin', default=0, digits=(16, 2),
         help="Margin to apply on price to obtain sale price")
 
-    @api.multi
     def _get_supplierinfo_pricelist_price(self):
         self.ensure_one()
         sale_price = self.price

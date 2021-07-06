@@ -48,32 +48,21 @@ class PadronIIBBCABAWizard(models.TransientModel):
     def import_zip(self):
         """ Importa archivo de IIBB CABA y genera las reglas para los partners correspondientes"""
         padron_caba_path = "/tmp/padron_caba/"
-        try:
-            import rarfile
-        except:
-            raise ValidationError("Por favor contactese con el administrador del "
-                                  "sistema para instalar las librerias necesarias ('unrar' (apt) y 'rarfile' (pip)).")
-        if self.filename.split(".")[-1].lower() not in ["zip", "rar"]:
-            raise ValidationError('Error\nDebe utilizar un archivo ZIP o RAR.')
+        if self.filename.split(".")[-1].lower() != "zip":
+            raise ValidationError('Error\nDebe utilizar un archivo ZIP.')
         # Creo el directorio si no existe
         if not os.path.isdir(padron_caba_path):
             os.mkdir(padron_caba_path)
-        file_base = base64.b64decode(self.file)
-        file_io = io.BytesIO(file_base)
-        if self.filename.split(".")[-1].lower() == "zip":
-            try:
-                file_ref = zipfile.ZipFile(file_io)
-            except:
-                raise ValidationError('Error de formato de archivo ZIP')
-        else:
-            try:
-                file_ref = rarfile.RarFile(file_io)
-            except:
-                raise ValidationError('Error de formato de archivo RAR')
+        try:
+            zip_base = base64.b64decode(self.file)
+            zip_io = io.BytesIO(zip_base)
+            zip_ref = zipfile.ZipFile(zip_io)
+        except:
+            raise ValidationError('Error de formato de archivo, debe utilizar un archivo ZIP')
 
         # Extraigo todos los archivos en el directorio generado
-        file_ref.extractall(padron_caba_path)
-        file_ref.close()
+        zip_ref.extractall(padron_caba_path)
+        zip_ref.close()
         # Busco todos los archivos txt dentro del directorio
         files_txt = glob.glob(padron_caba_path + "*.txt")
         if files_txt:
@@ -90,7 +79,7 @@ class PadronIIBBCABAWizard(models.TransientModel):
                 raise ValidationError('Ha ocurrido un error al intentar cargar el padron. Vuelva a intentarlo.')
         # Elimino archivos
         os.system("rm -r /tmp/padron_caba")
-
+        
         self.massive_update_iibb_caba_values()
 
     def massive_update_iibb_caba_values(self):

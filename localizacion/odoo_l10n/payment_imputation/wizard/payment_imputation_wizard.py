@@ -145,20 +145,10 @@ class PaymentImputationWizard(models.TransientModel):
         self._validate_payment_imputation()
         self.reconcile_credits()
         self.debit_imputation_line_ids.check_imputation_amount()
-        payment = self.env['account.payment'].create(self._get_payment_vals())
-
-        return {
-            'name': 'Pago',
-            'views': [[False, "form"], [False, "tree"]],
-            'res_model': 'account.payment',
-            'type': 'ir.actions.act_window',
-            'res_id': payment.id,
-        }
-
-    def _get_payment_vals(self):
         payment_methods = self.payment_type == 'inbound' and self.journal_id.inbound_payment_method_ids \
                           or self.journal_id.outbound_payment_method_ids
-        return {
+
+        payment = self.env['account.payment'].create({
             'partner_id': self.partner_id.id,
             'journal_id': self.journal_id.id,
             'payment_type': self.payment_type,
@@ -169,6 +159,14 @@ class PaymentImputationWizard(models.TransientModel):
             'payment_date': self._get_payment_date(),
             'currency_id': self.currency_id.id,
             'advance_amount': self.advance_amount,
+        })
+
+        return {
+            'name': 'Pago',
+            'views': [[False, "form"], [False, "tree"]],
+            'res_model': 'account.payment',
+            'type': 'ir.actions.act_window',
+            'res_id': payment.id,
         }
 
     def reconcile_credits(self):

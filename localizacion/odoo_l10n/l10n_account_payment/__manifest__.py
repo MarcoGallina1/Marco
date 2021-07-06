@@ -20,7 +20,7 @@
 
     'name': 'l10n Account Payment',
 
-    'version': '1.0.1',
+    'version': '1.0',
 
     'category': '',
 

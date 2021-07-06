@@ -135,14 +135,10 @@ class AccountMove(models.Model):
 
     def post(self):
         for invoice in self.filtered(lambda x: x.voucher_type_id):
-            if not invoice.amount_total:
-                raise ValidationError('No pueden validarse documentos con monto total igual a cero.')
-
             # Obtenemos el proximo numero o validamos su estructura
             if not invoice.is_purchase_document() and invoice.pos_ar_id:
-                document_book = invoice.validate_document_book()
-                # Llamamos a la funcion a ejecutarse desde el tipo de talonario,
-                # de esta forma, hará lo correspondiente
+                document_book = self.validate_document_book()
+                # Llamamos a la funcion a ejecutarse desde el tipo de talonario, de esta forma, hará lo correspondiente
                 # para distintos casos (preimpreso, electronica, fiscal, etc.)
                 getattr(invoice, document_book.book_type_id.foo)(document_book)
 
@@ -151,32 +147,23 @@ class AccountMove(models.Model):
 
             invoice.set_voucher_name()
             invoice.check_invoice_duplicity()
-        for invoice in self.filtered(lambda x: not x.voucher_type_id and x.type in ['in_invoice', 'in_refund']):
-            invoice.set_in_voucher_name()
-        return super(AccountMove, self).post()
 
-    def set_in_voucher_name(self):
-        """ Asigna el nombre del documento segun el nombre del documento"""
-        self.ensure_one()
-        self.name = '{}'.format(
-            self.voucher_name
-        )
+        return super(AccountMove, self).post()
 
     def set_voucher_name(self):
         """ Asigna el nombre del documento segun el tipo de documento y el punto de venta """
         self.ensure_one()
-        if not self.voucher_name and self.pos_ar_id:
+        if not self.voucher_name:
             self.voucher_name = '{}-{}'.format(
                 self.pos_ar_id.name.zfill(self.pos_ar_id.prefix_quantity or 0),
                 self.pos_ar_id.next_number(self.voucher_type_id)
             )
         self.name = '{}{}'.format(
             self.voucher_type_id.prefix + ' ' if self.voucher_type_id.prefix else '',
-            self.voucher_name or ''
+            self.voucher_name
         )
 
     def validate_document_book(self):
-        self.ensure_one()
         if not self.voucher_type_id:
             raise ValidationError("Por favor, asignar tipo de comprobante")
         document_book = self.get_document_book()

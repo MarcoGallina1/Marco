@@ -8,7 +8,6 @@ from odoo import api, fields, models
 class ProductPricelist(models.Model):
     _inherit = 'product.pricelist'
 
-    @api.multi
     def _compute_price_rule(self, products_qty_partner, date=False,
                             uom_id=False):
         """Recompute price after calling the atomic super method for

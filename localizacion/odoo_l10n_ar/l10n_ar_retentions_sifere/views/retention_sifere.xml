@@ -50,7 +50,7 @@
             <field name="name">retention.sifere.tree</field>
             <field name="model">retention.sifere</field>
             <field name="arch" type="xml">
-                <tree string="SIFERE Retenciones" default_order="date_from desc">
+                <tree string="SIFERE Retenciones">
                     <field name="name"/>
                     <field name="company_id" groups="base.group_multi_company"/>
                     <field name="date_from"/>

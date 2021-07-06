@@ -28,7 +28,8 @@ class CreditCardCouponReconcileTaxLine(models.Model):
     tax_id = fields.Many2one(
         comodel_name='account.tax', 
         string='Impuesto', 
-        domain=lambda self: self._domain_tax_id(),
+        domain="[('company_id', '=', company_id),('type_tax_use', '=', 'purchase'), '|',\
+        ('is_vat', '=', True), ('is_exempt', '=', True)]",
         required=True,
         check_company=True
     )
@@ -40,13 +41,6 @@ class CreditCardCouponReconcileTaxLine(models.Model):
     base = fields.Float(
         string='Base'
     )
-
-    @api.model
-    def _domain_tax_id(self):
-        tax_group_taxes = self.env.ref('account.tax_group_taxes')
-        domain = "[('company_id', '=', company_id),('type_tax_use', '=', 'purchase'), '|', '|',\
-        ('is_vat', '=', True), ('is_exempt', '=', True), ('tax_group_id', '=', {})]".format(tax_group_taxes.id)
-        return domain
 
     @api.constrains('base')
     def check_negative_base(self):

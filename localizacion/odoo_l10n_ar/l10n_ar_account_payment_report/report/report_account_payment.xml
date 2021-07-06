@@ -133,11 +133,9 @@
                               t-options='{"widget": "monetary"}'
                         />
                         <br/>
-                        <t t-if="r.retention_id.type in ['gross_income', 'profit', 'vat']">
+                        <t t-if="r.retention_id.type not in ['gross_income', 'profit', 'vat']">
                             <strong>Base de cálculo: </strong>
-                            <span t-field="r.base"
-                                  t-options='{"widget": "monetary"}'
-                            />
+                            <span t-field="r.base"/>
                             <br/>
                         </t>
                         <strong>Monto de la Retención: </strong>
@@ -159,10 +157,10 @@
 
         <template id="report_payment_receipt_document" inherit_id="account.report_payment_receipt_document">
             <div class="page" position="attributes">
-                <attribute name="t-if">not(o.journal_id.multiple_payment_journal or o.journal_id.pos_ar_id)</attribute>
+                <attribute name="t-if">not(o.journal_id.multiple_payment_journal or o.journal_id.pos_ar_id) or o.state in ['draft', 'cancelled']</attribute>
             </div>
             <div class="page" position="after">
-                <div class="page" t-if="(o.journal_id.multiple_payment_journal or o.journal_id.pos_ar_id)">
+                <div class="page" t-if="(o.journal_id.multiple_payment_journal or o.journal_id.pos_ar_id) and o.state not in ['draft', 'cancelled']">
                     <h3 style="text-align: center">
                         <span t-if="o.payment_type == 'inbound'">RECIBO N° </span>
                         <span t-if="o.payment_type == 'outbound'">ORDEN DE PAGO N° </span>
@@ -170,8 +168,7 @@
                             <span t-esc="o.voucher_name.upper()"/>
                         </t>
                         <t t-else="">
-                            <span t-if="o.name" t-esc="o.name.upper()"/>
-                            <span t-if="not o.name" t-esc="''"/>
+                            <span t-esc="o.name.upper()"/>
                         </t>
                     </h3>
                     <div class="row">
@@ -187,9 +184,6 @@
                         <div class="col-6" t-if="o.amount">
                             <strong>IMPORTE: </strong><span t-field="o.amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
                          </div>
-                         <div class="col-6 offset-3" style="text-align: right" t-if="o.communication">
-                            <p t-field="o.communication" />
-                        </div>
                     </div>
 
                      <!-- Tabla de documentos imputados -->
@@ -275,6 +269,7 @@
                     <!-- Detalles de formas de pago -->
                     <br/>
 
+                    <t t-set="total_payments" t-value="0.0"/>
                     <t t-set="payment_line_recordsets" t-value="o._get_payment_line_recordsets()"/>
                     <t t-set="multi_currency" t-value="any(rset.currency_id and rset.currency_id != o.currency_id for rset in payment_line_recordsets)"/>
                     <h4>
@@ -296,6 +291,7 @@
                         <tbody>
                             <tr t-foreach="payment_line_recordsets" t-as="payment_line_record">
                                 <tr t-foreach="payment_line_record" t-as="payment_line">
+                                    <t t-set="total_payments" t-value="total_payments+payment_line.payment_currency_amount"/>
                                     <td>
                                         <span t-esc="payment_line.get_first_move_line_name().upper()"/>
                                     </td>
@@ -324,7 +320,7 @@
                                     <tr class="border-black o_subtotal">
                                         <td><strong>TOTAL</strong></td>
                                         <td class="text-right">
-                                            <span t-esc="o.get_payment_line_total()"
+                                            <span t-esc="total_payments"
                                                   t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                                         </td>
                                     </tr>

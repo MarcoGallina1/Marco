@@ -55,20 +55,20 @@ class SaleInvoicePresentation(SalePresentation):
         line.codigoOperacion = self.get_codigoOperacion(invoice)
         line.otrosTributos = self.get_otrosTrib(invoice)
         line.fechaVtoPago = self.get_fecha_vto_pago()
-
+        
     # ----------------CAMPOS VENTAS----------------
     def fill_perceptions(self, invoice, line):
         if invoice.partner_id.property_account_position_id == self.data.fiscal_position_nc:
             line.percepcionNC = self.get_percepcion_nc(invoice)
         else:
             line.percepcionNC = 0
-            line.importePercepciones = self.get_importe_per_by_jurisdiction(invoice, ['nacional'])
-            line.importePerIM = self.get_importe_per_by_jurisdiction(invoice, ['municipal'])
-            line.importePerIIBB = self.get_importe_per_by_type(invoice, ['gross_income'])
+            line.importePercepciones = self.get_importe_per_by_jurisdiction(invoice, 'nacional')
+            line.importePerIM = self.get_importe_per_by_jurisdiction(invoice, 'municipal')
+            line.importePerIIBB = self.get_importe_per_by_type(invoice, 'gross_income')
 
     def get_percepcion_nc(self, invoice):
         """
-        Percepcion a no categorizados.
+        Percepcion a no categorizados. 
         :param invoice: record.
         :return: string, importe percepcion nc, ej: '2134'
         """
@@ -80,15 +80,15 @@ class SaleInvoicePresentation(SalePresentation):
             if ml.tax_line_id.tax_group_id in tax_group_perception:
                 importe_precepciones += ml.price_subtotal
 
-        return self.helper.format_amount(importe_precepciones)
+        return self.helper.format_amount(self.rate * importe_precepciones)
 
     # No implementado
     @staticmethod
     def get_fecha_vto_pago():
         """
-        Fecha de vencimiento de pago. Sólo se informará cuando la prestación se corresponda
-        con un servicio público, siendo obligatorio para los comprobantes tipo '017 - Liquidación de
-        Servicios Públicos Clase A' y '018 – Liquidación de Servicios Públicos Clase B' y opcional
+        Fecha de vencimiento de pago. Sólo se informará cuando la prestación se corresponda 
+        con un servicio público, siendo obligatorio para los comprobantes tipo '017 - Liquidación de 
+        Servicios Públicos Clase A' y '018 – Liquidación de Servicios Públicos Clase B' y opcional 
         para el resto de los comprobantes.
         """
         return ""

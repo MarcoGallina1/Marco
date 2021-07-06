@@ -61,11 +61,6 @@ class AccountMove(models.Model):
             perception.onchange_aliquot()
         self.onchange_perception_ids()
 
-    @api.onchange('partner_id')
-    def _onchange_partner_id(self):
-        self.onchange_set_perception_values()
-        return super(AccountMove, self)._onchange_partner_id()
-
     @api.onchange('perception_ids')
     def onchange_perception_ids(self):
         self.delete_perceptions()

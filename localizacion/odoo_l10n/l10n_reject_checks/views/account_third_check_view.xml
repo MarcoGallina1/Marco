@@ -25,7 +25,7 @@
                 <button name="button_reject_check"
                         type="object" string="Rechazar"
                         confirm="Está seguro?"
-                        states="deposited,wallet,handed,sold"
+                        states="deposited,wallet,handed"
                         groups="l10n_account_check.group_account_treasury_manager"
                 />
                 <button name="button_revert_reject"

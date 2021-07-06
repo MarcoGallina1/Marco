@@ -24,7 +24,7 @@
             <field name="arch" type="xml">
                 <field name="description" position="after">
                     <field name="invoicing_address_id"/>
-                    <field name="invert_colors_qr"/>
+                    <field name="copies_quantity"/>
                 </field>
             </field>
         </record>

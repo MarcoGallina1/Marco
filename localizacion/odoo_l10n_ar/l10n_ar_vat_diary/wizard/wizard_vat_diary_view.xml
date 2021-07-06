@@ -26,7 +26,6 @@
                         <group>
                             <field name="date_from"/>
                             <field name="type"/>
-                            <field name="separate_not_taxable_from_exempt"/>
                             <field name="include_suffered_retentions" attrs="{'invisible': [('type', '!=', 'purchases')]}"/>
                         </group>
                         <group>
@@ -38,9 +37,10 @@
                                 name="generate_xls_report"
                                 string="Descargar XLS"
                                 class="btn-primary"/>
+                        o
                         <button type="special"
                                 special="cancel"
-                                string="Cancelar"
+                                string="cancelar"
                                 class="btn-default"/>
                     </footer>
                 </form>
