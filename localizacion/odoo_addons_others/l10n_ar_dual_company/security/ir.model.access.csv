@@ -1,3 +1,0 @@
-id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
-access_multicompany_taxes_relation_user,multicompany_taxes_relation_user,model_multicompany_taxes_relation,base.group_user,1,0,0,0
-access_multicompany_taxes_relation_manager,multicompany_taxes_relation_manager,model_multicompany_taxes_relation,account.group_account_manager,1,1,1,1
