@@ -101,7 +101,7 @@ class Presentation:
         ] and invoice.partner_id.country_id != invoice.env.ref('base.ar'):
             vat = invoice.partner_id.country_id.vat
         return vat
-        
+
     def get_denominacionPartner(self, invoice):
         """
         Nombre del partner. Se obtiene del campo name del partner de la factura.
@@ -116,7 +116,7 @@ class Presentation:
         :param invoice: record, factura.
         :return: string, monto ej: 5000->'500000' , 0->'0'
         """
-        return self.helper.format_amount(self.rate * invoice.amount_total)
+        return self.helper.format_amount(invoice.amount_total)
 
     def get_importeTotalNG(self, invoice):
         """
@@ -125,7 +125,7 @@ class Presentation:
         :param invoice: record.
         :return: string, monto ej: 23.00-> '2300'
         """
-        return self.helper.format_amount(self.rate * invoice.amount_not_taxable)
+        return self.helper.format_amount(invoice.amount_not_taxable)
 
     def get_importeTotalNG_purchase(self, invoice):
         # Validacion de SIAP:
@@ -140,9 +140,9 @@ class Presentation:
         """
         Devuelve el monto total de importes de operaciones exentas.
         :param invoice: record.
-        :return: string, monto ej: 23.00-> '2300' 
+        :return: string, monto ej: 23.00-> '2300'
         """
-        return self.helper.format_amount(self.rate * invoice.amount_exempt)
+        return self.helper.format_amount(invoice.amount_exempt)
 
     def get_importe_per_by_type(self, invoice, type):
         """
@@ -154,54 +154,56 @@ class Presentation:
         perception_perception_proxy = invoice.env['perception.perception']
         tax_group_perception = perception_perception_proxy.get_perception_groups()
         importe_precepciones = 0
-        for ml in invoice.line_ids.filtered(lambda t: t.price_subtotal > 0 and t.tax_line_id and not t.tax_line_id.is_vat):
+        for ml in invoice.line_ids.filtered(
+            lambda t: t.price_subtotal > 0 and t.tax_line_id and not t.tax_line_id.is_vat
+        ):
             if ml.tax_line_id.tax_group_id in tax_group_perception:
                 perception = perception_perception_proxy.search([
-                    ('tax_id', '=', ml.tax_line_id.id)],
-                    ('type', '=', type),
+                    ('tax_id', '=', ml.tax_line_id.id),
+                    ('type', 'in', type)],
                     limit=1
                 )
-                if not perception:
-                    raise ValidationError("Percepcion no encontrada para el impuesto".format(ml.tax_line_id.name))
-                importe_precepciones += ml.price_subtotal
+                if perception:
+                    importe_precepciones += ml.price_subtotal
 
-        return self.helper.format_amount(self.rate * importe_precepciones)
+        return self.helper.format_amount(importe_precepciones)
 
     def get_importe_per_by_jurisdiction(self, invoice, jurisdiction):
         """
         Devuelve el monto total de percepciones de la factura de acuerdo al tipo de jurisdiccion de la percepcion.
         :param jurisdiction: string, ej 'municipal'
         :param invoice: record.
-        :return: string, monto ej: '4500' 
+        :return: string, monto ej: '4500'
         """
         perception_perception_proxy = invoice.env['perception.perception']
         tax_group_perception = perception_perception_proxy.get_perception_groups()
         importe_precepciones = 0
-        for ml in invoice.line_ids.filtered(lambda t: t.price_subtotal > 0 and t.tax_line_id and not t.tax_line_id.is_vat):
+        for ml in invoice.line_ids.filtered(
+                lambda t: t.price_subtotal > 0 and t.tax_line_id and not t.tax_line_id.is_vat
+        ):
             if ml.tax_line_id.tax_group_id in tax_group_perception:
                 perception = perception_perception_proxy.search([
-                    ('tax_id', '=', ml.tax_line_id.id)],
-                    ('jurisdiction', '=', jurisdiction),
+                    ('tax_id', '=', ml.tax_line_id.id),
+                    ('jurisdiction', 'in', jurisdiction)],
                     limit=1
                 )
-                if not perception:
-                    raise ValidationError("Percepcion no encontrada para el impuesto".format(ml.tax_line_id.name))
-                importe_precepciones += ml.price_subtotal
+                if perception:
+                    importe_precepciones += ml.price_subtotal
 
-        return self.helper.format_amount(self.rate * importe_precepciones)
+        return self.helper.format_amount(importe_precepciones)
 
     def get_importeImpInt(self, invoice):
         """
-        Obtiene los impuestos internos de la factura formateados en string. 
+        Obtiene los impuestos internos de la factura formateados en string.
         :param invoice: record.
-        :return: string, monto ej: '2300' 
+        :return: string, monto ej: '2300'
         """
         importe_internos = 0
         for ml in invoice.line_ids.filtered(lambda t: t.price_subtotal > 0 and t.tax_line_id and not t.tax_line_id.is_vat):
             if ml.tax_line_id == self.data.tax_group_internal:
                 importe_internos += ml.price_subtotal
 
-        return self.helper.format_amount(self.rate * importe_internos)
+        return self.helper.format_amount(importe_internos)
 
     def get_codigoMoneda(self, invoice):
         """
@@ -240,7 +242,7 @@ class Presentation:
         """
         Se devuelve el codigo de impuesto en base a las tablas de AFIP.
         :param tax: objeto impuesto
-        :return integer, codigo de impuesto afip, ej: 5 
+        :return integer, codigo de impuesto afip, ej: 5
         """
         tax_code = self.data.codes_model_proxy.get_code(
             'account.tax',
@@ -255,11 +257,11 @@ class Presentation:
         :param tax: record, impuesto.
         :return: string, monto del impuesto, ej:'1233'
         """
-        return self.helper.format_amount(self.rate * tax.price_subtotal)
+        return self.helper.format_amount(tax.price_subtotal)
 
     def get_codigoOperacion(self, invoice):
         """
-        Obtiene el codigo de operacion de acuerdo a los impuestos. 
+        Obtiene el codigo de operacion de acuerdo a los impuestos.
         -Si el total de impuestos menos los no gravados es igual a la cantidad de impuestos exentos, se
         califica la operacion como exenta.
         -Si el total de impuestos es igual al total de impuestos no gravados la operacion es no gravada.
@@ -322,9 +324,11 @@ class Presentation:
         """
         otrosTrib = 0.00
         tax_group_ids = self.data.tax_group_internal | self.data.tax_group_perception
-        for tax in invoice.line_ids:
+        for tax in invoice.line_ids.filtered(
+                lambda x: not x.tax_line_id.is_vat and x.tax_line_id and x.tax_line_id.tax_group_id not in tax_group_ids
+        ):
             otrosTrib += tax.price_subtotal if tax.tax_line_id.tax_group_id not in tax_group_ids else 0
-        return self.helper.format_amount(self.rate * otrosTrib)
+        return self.helper.format_amount(otrosTrib)
 
     @staticmethod
     def get_invoice_exempt_taxes(invoice):
@@ -365,7 +369,7 @@ class PurchasePresentation(Presentation):
         """
         if invoice.voucher_type_id.denomination_id != self.data.type_d:
             return ''
-        return invoice.name
+        return invoice.importation_forward_number if invoice.importation_forward_number else ''
 
     def get_invoice_notTaxed_taxes(self, invoice):
         return [
@@ -376,7 +380,7 @@ class PurchasePresentation(Presentation):
 
 class PurchaseVatPresentation(PurchasePresentation):
 
-    def get_importeNetoGravado(self, tax):
+    def get_importeNetoGravado(self, invoice, tax):
         """
         Obtiene el neto gravado de la operacion. Para los impuestos exentos o no gravados devuelve 0.
         :param tax: objeto impuesto
@@ -384,7 +388,14 @@ class PurchaseVatPresentation(PurchasePresentation):
         """
         if tax.tax_line_id.is_exempt or tax.tax_line_id == self.data.tax_purchase_ng:
             return '0'
-        return self.helper.format_amount(tax.amount_subtotal * self.rate)
+
+        base = sum(
+            invoice.invoice_line_ids.filtered(
+                lambda x: tax.tax_line_id in x.tax_ids
+            ).mapped('price_subtotal')
+        )
+
+        return self.helper.format_amount(base)
 
 
 class SalePresentation(Presentation):

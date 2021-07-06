@@ -23,6 +23,18 @@
             <field name="model">padron.iibb.caba.wizard</field>
             <field name="arch" type="xml">
                 <form string="Importar Padron CABA">
+                    <div class="alert alert-warning" role="alert" colspan="2">
+                        <strong><span>¡ATENCION!:</span></strong>
+                        <p>
+                            El archivo debe ser con las siguientes extensiones: RAR o ZIP.<br/>
+                            En la siguiente URL se podrá descargar directo el archivo con el formato RAR:
+                            <ul>
+                              <li>
+                                  https://www.agip.gob.ar/agentes/agentes-de-recaudacion/ib-agentes-recaudacion/padrones/padron-de-regimenes-generales-
+                              </li>
+                            </ul>
+                        </p>
+                    </div>
                     <group string="Archivo">
                         <field name="file" filename="filename"/>
                         <field name="filename" invisible="1"/>

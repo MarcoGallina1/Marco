@@ -22,7 +22,7 @@ from datetime import datetime, date
 import zeep
 from dateutil.relativedelta import relativedelta
 from l10n_ar_api import documents
-from l10n_ar_api.afip_webservices import wsfe, wsfex
+from l10n_ar_api.afip_webservices import wsfe, wsfex, wsbfe
 from odoo import models, fields, registry, api
 from odoo.exceptions import ValidationError
 
@@ -47,7 +47,13 @@ class AccountMove(models.Model):
     cbu_partner_bank_id = fields.Many2one('res.partner.bank', 'Cuenta bancaria')
     cbu_transmitter = fields.Char('CBU Emisor')
     fce_associated_document_ids = fields.One2many('fce.associated.document', 'invoice_id', 'Documentos asociados')
-    fce_rejected = fields.Boolean('Rechazada por el comprador?')
+    fce_rejected = fields.Boolean('¿Rechazada por el comprador?')
+    transfer_option = fields.Selection(
+        selection=[('SCA', 'Sistema de circulación abierta'),
+                   ('ADC', 'Agente de depósito colectivo')],
+        string="Opción de transferencia",
+        copy=False
+    )
 
     @api.onchange('cbu_partner_bank_id')
     def onchange_partner_bank_id(self):
@@ -78,6 +84,7 @@ class AccountMove(models.Model):
         for invoice in invoices:
             # Validamos los campos
             invoice._validate_required_electronic_fields()
+            afip_wsfe.check_webservice_status()
             # Obtenemos el codigo de comprobante
             document_afip_code = invoice.get_document_afip_code(document_book)
             new_cr = registry(self.env.cr.dbname).cursor()
@@ -99,7 +106,6 @@ class AccountMove(models.Model):
             # Chequeamos la conexion y enviamos las facturas a AFIP, guardando el JSON enviado, el response y mostrando
             # los errores (en caso de que los haya)
             try:
-                afip_wsfe.check_webservice_status()
                 response, invoice_detail = afip_wsfe.get_cae(electronic_invoices, pos.name)
                 afip_wsfe.show_error(response)
             except Exception as e:
@@ -187,6 +193,22 @@ class AccountMove(models.Model):
                     str(auth.get('Cbte_nro')).zfill(8)
                 )
             })
+    
+    def _write_wsbfe_details_on_invoice(self, request, response):
+        # Busco, dentro del detalle de la respuesta, el segmento correspondiente a la factura
+        auth = response.get('BFEResultAuth', {})
+        if auth.get('Resultado') == 'A':
+            self.write({
+                'cae': auth.get('Cae'),
+                'cae_due_date': datetime.strptime(
+                    auth.get('Fch_venc_Cae'),
+                    '%Y%m%d'
+                ) if auth.get('Fch_venc_Cae') else None,
+                'voucher_name': '{:0>{prefix_qty}}-{:0>8}'.format(
+                        request.get('Punto_vta'),
+                        request.get('Cbte_nro'),
+                        prefix_qty=self.pos_ar_id.prefix_quantity or 0)
+            })
 
     @staticmethod
     def convert_currency(from_currency, to_currency, amount=1.0, d=None):
@@ -249,52 +271,46 @@ class AccountMove(models.Model):
         # Agregamos impuestos y percepciones
         self._add_vat_to_electronic_invoice(electronic_invoice)
         self._add_other_tributes_to_electronic_invoice(electronic_invoice)
-        # Agregamos lo exclusivo de facturas de crédito
+        # Agregamos los documentos asociados para Notas de débito o crédito
         self._add_associated_documents_to_electronic_invoice_refund(electronic_invoice)
+        # Agregamos lo exclusivo de facturas de crédito
+        self._add_optionals_to_credit_invoice(electronic_invoice)
         return electronic_invoice
 
     def _add_associated_documents_to_electronic_invoice_refund(self, electronic_invoice):
-        """ Agrega los documentos asociados para facturas de credito cuando se envíen notas de débito o crédito """
-        self._add_associated_document(electronic_invoice)
+        """ Agrega los documentos asociados para facturas cuando se envíen notas de débito o crédito """
+        if self.is_debit_note or self.type == 'out_refund':
+            if not self.fce_associated_document_ids:
+                raise ValidationError(
+                    "No se puede enviar una nota de débito o crédito FCE sin documentos asociados"
+                )
+            electronic_invoice.associated_documents = list(map(lambda assoc_doc: assoc_doc.create_wsfe_associated_document(), self.fce_associated_document_ids))
 
+    def _add_optionals_to_credit_invoice(self, electronic_invoice):
+        """ Agrega los opcionales para facturas de credito """
         if self.is_credit_invoice:
             if self.is_debit_note or self.type == 'out_refund':
-                canceled = False
-                for document in self.fce_associated_document_ids:
-                    if document.canceled:
-                        canceled = True
-                canceled = 'S' if canceled else 'N'
+                canceled = 'S' if any(self.fce_associated_document_ids.mapped('canceled')) else 'N'
                 # Hay que informar el opcional de si el comprobante fue o no anulado por el comprador (ID 22)
                 electronic_invoice.array_optionals = [wsfe.wsfe.WsfeOptional(22, canceled)]
             else:
                 # 2101 es para CBU, como por ahora solo vamos a enviar ese opcional lo dejamos así. Si el día de mañana
                 # vamos a utilizar mas opcionales habría que crear el modelo y mapeo necesario.
+                # 27 es la opción de la transferencia, se puede informar que la factura se envíe al sistema de circulación
+                # abierta o a un agente de depósito colectivo.
                 if not self.cbu_transmitter:
-                    raise ValidationError("Para enviar una Factura de credito es necesario cargar CBU Emisor")
-                electronic_invoice.array_optionals = [wsfe.wsfe.WsfeOptional(2101, self.cbu_transmitter)]
-
-    def _add_associated_document(self, electronic_invoice):
-        if self.is_debit_note or self.type == 'out_refund':
-            if not self.fce_associated_document_ids:
-                raise ValidationError(
-                    "No se puede enviar una nota de débito o crédito sin documentos asociados"
-                )
-            associated_documents = []
-            for document in self.fce_associated_document_ids:
-                associated_documents.append(wsfe.wsfe.WsfeAssociatedDocument(
-                    document.document_code,
-                    document.point_of_sale,
-                    document.document_number,
-                    document.cuit_transmitter,
-                    document.date
-                ))
-                electronic_invoice.associated_documents = associated_documents
+                    raise ValidationError("Para enviar una Factura de crédito es necesario cargar CBU Emisor")
+                if not self.transfer_option:
+                    raise ValidationError("Para enviar una Factura de crédito es necesario informar \
+                                           si se utiliza el Sistema de circulación abierta o Agente de depósito colectivo")
+                electronic_invoice.array_optionals = [wsfe.wsfe.WsfeOptional(2101, self.cbu_transmitter),
+                                                      wsfe.wsfe.WsfeOptional(27, self.transfer_option)]
 
     def _reverse_moves(self, default_values_list=None, cancel=False):
         values = super(AccountMove, self)._reverse_moves(default_values_list, cancel)
         if len(self) > 1:
             raise ValidationError("No se puede realizar la acción de reversión masiva.")
-        if self.type in ('out_invoice', 'out_refund'):
+        if self.type in ('out_invoice', 'out_refund') and self.voucher_type_id and self.voucher_name:
             name = self.voucher_name.split('-')
             name = name[1] if len(name) > 1 else name[0]
             values['fce_associated_document_ids'] = [(0, 0, {
@@ -327,7 +343,7 @@ class AccountMove(models.Model):
 
         perception_perception_proxy = self.env['perception.perception']
         tax_group_internal = self.env.ref('l10n_ar.tax_group_internal')
-        tax_group_perception_iibb = self.env['perception.perception'].get_perception_iibb_groups()
+        tax_group_perception_iibb = self.env['perception.perception'].get_perception_gross_income_groups()
 
         # Contemplamos 2 casos de tributos que no sean IVA, internos o percepciones.
         for ml in self.line_ids.filtered(lambda t: t.price_subtotal > 0 and t.tax_line_id and not t.tax_line_id.is_vat):
@@ -376,6 +392,21 @@ class AccountMove(models.Model):
     def _validate_required_electronic_exportation_fields(self):
         if not self.partner_id.partner_document_type_id:
             raise ValidationError('Por favor, configurar tipo de documento en el cliente')
+
+    def _validate_required_fiscal_electronic_bond_fields(self):
+        self._validate_required_electronic_fields()
+
+        denomination_a = self.env.ref('l10n_ar_afip_tables.account_denomination_a')
+        cuit = self.env.ref('l10n_ar_afip_tables.partner_document_type_80')
+        if self.voucher_type_id.denomination_id == denomination_a and not self.partner_id.partner_document_type_id == cuit:
+            raise ValidationError("El tipo de documento del cliente debe ser\
+                                  CUIT en comprobantes tipo A.")
+
+        exempt_iva = self.env.ref('l10n_ar_afip_tables.codes_models_afip_account_tax_2_sale')
+        for line in self.invoice_line_ids:
+            if any(tax == exempt_iva for tax in line.tax_ids) and not self.amount_exempt:
+                raise ValidationError("El importe de operaciones exentas debe ser\
+                                        mayor a 0 donde exista algun ítem de factura con Iva exento")
 
     def _get_afip_concept_based_on_products(self):
         """
@@ -566,7 +597,7 @@ class AccountMove(models.Model):
         electronic_invoice.incoterms = 'CIF'
         # Agregamos items
         electronic_invoice.array_items = self.add_item_exportation()
-        self._add_associated_document(electronic_invoice)
+        self._add_associated_documents_to_electronic_invoice_refund(electronic_invoice)
         return electronic_invoice
 
     def add_item_exportation(self):
@@ -602,6 +633,214 @@ class AccountMove(models.Model):
             'result': result,
             'date': fields.Datetime.now(),
         })
+    
+    # BONO FISCAL
+    def action_fiscal_electronic_bond(self, document_book):
+        """
+        Realiza el envio a AFIP del bono y escribe en el mismo el CAE y su fecha de vencimiento.
+        :raises ValidationError: Si el talonario configurado no tiene la misma numeracion que en AFIP.
+                                 Si hubo algun error devuelto por afip al momento de enviar los datos.
+        """
+        electronic_invoices = []
+        pos = document_book.pos_ar_id
+        invoices = self.filtered(lambda l: not l.cae and l.amount_total and l.pos_ar_id == pos).sorted(lambda l: l.id)
+        sent_invoices = invoices.filtered(lambda x: any(request.result == 'A' for request in x.wsfe_request_detail_ids))
+        invoices -= sent_invoices
 
+        # Si hubo un problema despues de escribir una respuesta y no se llegaron a escribir los detalles en las facturas
+        for invoice in sent_invoices:
+            invoice._write_wsbfe_details_on_invoice(
+                ast.literal_eval(invoice.wsfe_request_detail_ids[0].request_sent),
+                ast.literal_eval(invoice.wsfe_request_detail_ids[0].request_received)
+            )
+
+        if invoices:
+            afip_wsbfe = invoices[0]._get_wsbfe()
+
+        for invoice in invoices:
+            # Validamos los campos
+            invoice._validate_required_fiscal_electronic_bond_fields()
+            # Obtenemos el codigo de comprobante
+            document_afip_code = invoice.get_document_afip_code(document_book)
+            # Validamos la numeracion
+            document_book.action_wsfe_number(afip_wsbfe, document_afip_code)
+            # Armamos la factura
+            electronic_invoices.append(invoice._set_electronic_bond_details(document_afip_code))
+
+        if electronic_invoices:
+            responses = None
+            new_cr = None
+
+            # Chequeamos la conexion y enviamos las facturas a AFIP, guardando el JSON enviado, el response y mostrando
+            # los errores (en caso de que los haya)
+            try:
+                afip_wsbfe.check_webservice_status()
+                responses, invoice_details = afip_wsbfe.get_cae(electronic_invoices, pos.name)
+                for r in responses:
+                    afip_wsbfe.show_error(r)
+                if len(responses) != len(invoice_details):
+                    raise ValidationError('Las longitudes son distintas')
+            except Exception as e:
+                raise ValidationError(e.args)
+            finally:
+                # Commiteamos para que no haya inconsistencia con la AFIP. Como ya tenemos el CAE escrito en el bono,
+                # al validarla nuevamente no se vuelve a enviar y se va a mantener la numeracion correctamente
+                if responses:
+                    for idx, response in enumerate(responses):
+                        if response and response.BFEResultAuth:
+                            invoices.write_wsbfe_response(invoice_details[idx], response)
+                            invoices.env.cr.commit()
+                            # Chequeamos que el resultado no sea rechazado y no haya errores.
+                            # Existen casos en que un bono fiscal tiene errores pero no figura como rechazado.
+                            # En tales casos no queremos incrementos de numeración ni escritura de detalles como CAE.
+                            # Ejemplo: ErrCode: 4881
+                            #          ErrMsg: Comprobante asociado PtoVta:X - Tipo:XXX - Nro:XX - OK - en estado autorizado 
+                            #          y NO RECHAZADO por el Comprador. Para autorizar un comprobante de anulacion como el 
+                            #          que intenta autorizar, el comprobante asociado debe estar rechazado por el comprador.
+                            if response.BFEResultAuth.Resultado != 'R' and not response.BFEErr.ErrMsg != 'OK':
+                                for invoice in invoices:
+                                    document_book.next_number()
+                                    document_book.env.cr.commit()
+                                    invoice._write_wsbfe_details_on_invoice(
+                                        zeep.helpers.serialize_object(invoice_details[idx]),
+                                        zeep.helpers.serialize_object(response),
+                                    )
+                            elif response.BFEResultAuth.Resultado == 'R':
+                                # Traemos el conjunto de observaciones
+                                errores = '\n'.join(response.BFEResultAuth.Obs) \
+                                    if hasattr(response.BFEResultAuth.Obs, 'Observaciones') else ''
+                                raise ValidationError('Hubo un error al intentar validar el documento\n{0}'.format(errores))
+
+    def _set_electronic_bond_details(self, document_afip_code):
+        """ Mapea los valores de ODOO al objeto FiscalElectronicBond"""
+
+        denomination_c = self.env.ref('l10n_ar_afip_tables.account_denomination_c')
+        codes_models_proxy = self.env['codes.models.relation']
+
+        # Seteamos los campos generales del bono
+        electronic_bond = wsbfe.invoice.FiscalElectronicBond(document_afip_code)
+        electronic_bond.taxed_amount = self.amount_to_tax
+        electronic_bond.untaxed_amount = self.amount_not_taxable if self.voucher_type_id.denomination_id != denomination_c else 0
+        electronic_bond.exempt_amount = self.amount_exempt if self.voucher_type_id.denomination_id != denomination_c else 0
+        electronic_bond.document_date = self.invoice_date or fields.Date.context_today(self)
+        electronic_bond.payment_due_date = self.invoice_date_due or fields.Date.context_today(self)
+        electronic_bond.customer_document_number = self.partner_id.vat
+        electronic_bond.customer_document_type = codes_models_proxy.get_code(
+            'partner.document.type',
+            self.partner_id.partner_document_type_id.id
+        )
+        electronic_bond.mon_id = self.env['codes.models.relation'].get_code(
+            'res.currency',
+            self.currency_id.id
+        )
+        electronic_bond.mon_cotiz = self.convert_currency(
+            from_currency=self.currency_id,
+            to_currency=self.company_id.currency_id,
+            d=self.invoice_date
+        )
+        electronic_bond.zone_id = 0 #Por el momento se utiliza 0
+
+        # Agrego items
+        electronic_bond.array_items = self.add_item_bond()
+        # Agregamos impuestos y percepciones
+        electronic_bond.total_amount = self.amount_total
+        perceptions_amount = self.get_perceptions_amount()
+        electronic_bond.reception_amount = perceptions_amount['total']
+        electronic_bond.municipal_reception_amount = perceptions_amount['mun']
+        electronic_bond.iibb_amount = perceptions_amount['gross_income']
+        electronic_bond.pay_off_tax_amount = 0.00
+        electronic_bond.rni_pay_off_tax_amount = 0.00
+        electronic_bond.internal_tax_amount = 0.00
+        # Agregamos los documentos asociados para Notas de débito o crédito
+        self._add_associated_documents_to_electronic_invoice_refund(electronic_bond)
+        # Agregamos lo exclusivo de facturas de crédito
+        self._add_optionals_to_credit_invoice(electronic_bond)
+
+        return electronic_bond
+
+    def add_item_bond(self):
+        """ Mapea los valores de ODOO al objeto FiscalElectronicBondItem """
+        array_items = []
+        for line in self.invoice_line_ids:
+
+            try:
+                measurement_unit = self.env['codes.models.relation'].get_code(
+                    'product.uom',
+                    line.uom_id.id
+                )
+            except:
+                measurement_unit = 98
+            unit_price = line.price_unit
+            bonification = ((line.price_unit * line.quantity) * (line.discount / 100)) if line.discount else 0.0
+            iva_id = self.env['codes.models.relation'].get_code('account.tax', line.tax_ids[0].id) if line.tax_ids else 0
+            product_ncm_code = self.check_product(line)
+            ncm_code = product_ncm_code
+            item = wsbfe.invoice.FiscalElectronicBondItem(ncm_code, line.product_id.name, line.quantity, measurement_unit, unit_price, bonification, iva_id)
+            array_items.append(item)
+
+        return array_items
+
+    def check_product(self, invoice_line):
+        """ Chequeo que tenga producto y este nomenclado"""
+        if not invoice_line.product_id:
+            raise ValidationError('Las lineas deben contener productos.')
+        if not invoice_line.product_id.ncm_id:
+            raise ValidationError('Es necesario que el producto {} este nomenclado.'.format(invoice_line.product_id.name))
+        return invoice_line.product_id.ncm_id.code
+
+    def _get_wsbfe(self):
+        """
+        Busca el objeto de wsbfe para utilizar sus servicios
+        :return: instancia de Wsbfe
+        """
+        wsbfe_config = self.env['wsfe.configuration'].search([
+            ('wsaa_token_id.name', '=', 'wsbfe'),
+            ('company_id', '=', self.company_id.id),
+        ])
+
+        if not wsbfe_config:
+            raise ValidationError('No se encontro una configuracion de bono fiscal electronico')
+
+        access_token = wsbfe_config.wsaa_token_id.get_access_token()
+        homologation = False if wsbfe_config.type == 'production' else True
+        afip_wsbfe = wsbfe.wsbfe.Wsbfe(access_token, self.company_id.vat, homologation)
+
+        return afip_wsbfe
+
+    def get_perceptions_amount(self):
+        total_amount = 0
+        mun_perceptions_amount = 0
+        gross_income_amount = 0
+        for perception in self.perception_ids:
+            total_amount += perception.amount
+            if perception.perception_id.jurisdiction == 'municipal':
+                mun_perceptions_amount += perception.amount
+            if perception.perception_id.type == 'gross_income':
+                gross_income_amount += perception.amount
+
+        perceptions_amount = {'total': total_amount,
+                              'mun': mun_perceptions_amount,
+                              'gross_income': gross_income_amount}
+        return perceptions_amount
+
+    def write_wsbfe_response(self, invoice_detail, response):
+        """ Escribe el envio y respuesta de un envio a AFIP """
+        if response.BFEResultAuth:
+            # Nos traemos el offset de la zona horaria para dejar en la base en UTC como corresponde
+            offset = datetime.now(pytz.timezone('America/Argentina/Buenos_Aires')).utcoffset().total_seconds() / 3600
+            fch_proceso = datetime.now() - relativedelta(hours=offset)
+            result = response.BFEResultAuth.Resultado
+            date = fch_proceso
+        else:
+            result = "Error"
+            date = fields.Datetime.now()
+
+        self.env['wsfe.request.detail'].sudo().create({
+            'invoice_ids': [(4, id) for id in self.ids],
+            'request_sent': invoice_detail,
+            'request_received': response,
+            'result': result,
+            'date': date
+        })
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

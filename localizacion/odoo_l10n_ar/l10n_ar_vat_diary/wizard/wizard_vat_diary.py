@@ -33,6 +33,7 @@ class WizardVatDiary(models.TransientModel):
         ('purchases', 'Compras')
     ], 'Tipo', required=True)
     include_suffered_retentions = fields.Boolean(string="Incluir retenciones sufridas")
+    separate_not_taxable_from_exempt = fields.Boolean(string="Separar No Gravado y Exento")
     date_from = fields.Date('Desde', required=True)
     date_to = fields.Date('Hasta', required=True)
     report = fields.Binary('Reporte')
@@ -50,7 +51,7 @@ class WizardVatDiary(models.TransientModel):
         return [
             ('date', '>=', self.date_from),
             ('date', '<=', self.date_to),
-            ('payment_id.state', 'not in', ('draft', 'cancel')),
+            ('payment_id.state', 'not in', ('draft', 'cancelled')),
             ('payment_id.payment_type', '=', 'inbound'),
             ('company_id', '=', self.env.company.id)
         ]
@@ -60,18 +61,22 @@ class WizardVatDiary(models.TransientModel):
         retentions = self.env['account.payment.retention'].search(domain)
         return retentions
 
-    def _get_invoices(self):
+    def _get_invoices_search_domain(self):
         domain = [
             ('date', '>=', self.date_from),
             ('date', '<=', self.date_to),
             ('state', 'not in', ('draft', 'cancel')),
-            ('company_id', '=', self.env.company.id)
+            ('company_id', '=', self.env.company.id),
+            ('fiscal_position_id.show_vat_diary', '=', True),
         ]
         if self.type == 'sales':
             domain.append(('type', 'in', ('out_invoice', 'out_refund')))
         else:
             domain.append(('type', 'in', ('in_invoice', 'in_refund')))
+        return domain
 
+    def _get_invoices(self):
+        domain = self._get_invoices_search_domain()
         invoices = self.env['account.move'].search(domain)
 
         return invoices
@@ -103,6 +108,15 @@ class WizardVatDiary(models.TransientModel):
             position += 2 if tax.is_vat else 1
 
         return res
+    
+    def get_last_position(self, taxes_position):
+        # Obtenemos el ultimo impuesto para saber en que columna van los totales
+        if taxes_position:
+            last_tax = max(taxes_position, key=taxes_position.get)
+            last_position = taxes_position[last_tax] + (2 if last_tax.is_vat else 1)
+        else:
+            last_position = 0
+        return last_position
 
     def _get_header(self):
         """ Genero un diccionario con los valores basicos de la cabecera del reporte """
@@ -137,15 +151,19 @@ class WizardVatDiary(models.TransientModel):
             last_position = taxes_position[last_tax] + (2 if last_tax.is_vat else 1)
         else:
             last_position = 0
-
-        header[last_position + last_header_position] = 'No Gravado/Exento'
-        header[last_position + last_header_position + 1] = 'Total'
+        if self.separate_not_taxable_from_exempt:
+            header[last_position + last_header_position] = 'No Gravado'
+            header[last_position + last_header_position + 1] = 'Exento'
+            header[last_position + last_header_position + 2] = 'Total'
+        else:
+            header[last_position + last_header_position] = 'No Gravado/Exento'
+            header[last_position + last_header_position + 1] = 'Total'
 
         return header
 
-    def _get_invoice_values(self, invoice, last_position, size, sign, rate):
+    def _get_invoice_values(self, invoice, last_position, size):
         """ Seteo los valores para cada posicion de una fila"""
-        return {
+        vals = {
             0: invoice.invoice_date.strftime('%d/%m/%Y'),
             1: invoice.partner_id.name,
             2: invoice.partner_id.vat or '',
@@ -153,17 +171,20 @@ class WizardVatDiary(models.TransientModel):
             4: invoice.voucher_type_id.name or '',
             5: invoice.name,
             6: invoice.jurisdiction_id.name or invoice.partner_id.state_id.name or '',
-            last_position + size: (invoice.amount_not_taxable + invoice.amount_exempt) * sign * rate,
-            last_position + size + 1: abs(invoice.amount_total_signed) * sign
         }
+        if self.separate_not_taxable_from_exempt:
+            vals[last_position + size + 2] = invoice.get_vat_diary_total()
+        else:
+            vals[last_position + size + 1] = invoice.get_vat_diary_total()
+        return vals
     
-    def _get_retention_values(self, retention, last_position, size, rate):
+    def _get_retention_values(self, retention, last_position, size):
         """ Seteo los valores para cada posicion de una fila"""
         if retention.certificate_no:
             name = "RET {}".format(retention.certificate_no)
         else:
-            name = "REC {}".format(retention.payment_id.name)
-        return {
+            name = "{}".format(retention.payment_id.name)
+        vals = {
             0: retention.date.strftime('%d/%m/%Y'),
             1: retention.partner_id.name,
             2: retention.partner_id.vat or '',
@@ -171,8 +192,14 @@ class WizardVatDiary(models.TransientModel):
             4: 'RETENCION',
             5: name,
             6: retention.jurisdiction,
-            last_position + size + 1: abs(retention.amount) * rate
         }
+        # Si se seleccionó para separar no gravado de exento debo mover los totales
+        # de las retenciones una columna más para que no caigan en la de exento
+        if self.separate_not_taxable_from_exempt:
+            vals[last_position + size + 2] = retention.get_vat_diary_total()
+        else:
+            vals[last_position + size + 1] = retention.get_vat_diary_total()
+        return vals
     
     def get_invoices_details(self, taxes_position, invoices, size_header, last_position):
         """
@@ -186,25 +213,8 @@ class WizardVatDiary(models.TransientModel):
         """
         res = []
         for invoice in invoices:
-            rate = self._get_invoice_currency_rate(invoice)
-            sign = invoice.type in ['in_refund', 'out_refund'] and -1 or 1
-            invoice_values = self._get_invoice_values(invoice, last_position, size_header, sign, rate)
-            for invoice_tax in invoice.line_ids.filtered(
-                    lambda x: x.price_subtotal and x.tax_line_id or (
-                            x.tax_line_id.is_vat and not x.tax_line_id.is_exempt)
-            ):
-                if invoice_tax.tax_line_id.is_vat:
-                    base = sum(
-                        invoice.invoice_line_ids.filtered(
-                            lambda x: any(tax.is_vat and not tax.is_exempt and tax == invoice_tax.tax_line_id for tax in x.tax_ids)
-                        ).mapped('price_subtotal')
-                    )
-                    invoice_values[taxes_position[invoice_tax.tax_line_id] + size_header] = round(base * sign * rate, 2)
-                    invoice_values[taxes_position[invoice_tax.tax_line_id] + size_header + 1] = round(
-                        invoice_tax.price_subtotal * sign * rate, 2)
-                else:
-                    invoice_values[taxes_position[invoice_tax.tax_line_id] + size_header] = round(
-                        invoice_tax.price_subtotal * sign * rate, 2)
+            invoice_values = self._get_invoice_values(invoice, last_position, size_header)
+            invoice.with_context(separate_not_taxable_from_exempt=self.separate_not_taxable_from_exempt).update_vat_diary_values(taxes_position, invoice_values, size_header)
 
             res.append(invoice_values)
         return res
@@ -221,15 +231,11 @@ class WizardVatDiary(models.TransientModel):
         """
         res = []
         for retention in retentions:
-            rate = retention._get_retention_currency_rate()
-            retention_values = self._get_retention_values(retention, last_position, size_header, rate)
-            tax_id = retention.retention_id.tax_id
-            retention_values[taxes_position[tax_id] + size_header] = round(retention.amount * rate, 2)
+            retention_values = self._get_retention_values(retention, last_position, size_header)
+            retention.with_context(separate_not_taxable_from_exempt=self.separate_not_taxable_from_exempt).update_vat_diary_values(taxes_position, retention_values, size_header)
 
             res.append(retention_values)
         return res
-    
-
 
     def get_details_values(self, taxes_position, invoices, retentions=None):
         """
@@ -242,12 +248,7 @@ class WizardVatDiary(models.TransientModel):
         """
         res = []
 
-        # Obtenemos el ultimo impuesto para saber en que columna van los totales
-        if taxes_position:
-            last_tax = max(taxes_position, key=taxes_position.get)
-            last_position = taxes_position[last_tax] + (2 if last_tax.is_vat else 1)
-        else:
-            last_position = 0
+        last_position = self.get_last_position(taxes_position)
 
         size_header = len(self._get_header())
         
@@ -256,11 +257,13 @@ class WizardVatDiary(models.TransientModel):
         if retentions:
             retentions_details = self.get_retentions_details(taxes_position, retentions, size_header, last_position)
             res.extend(retentions_details)
-        
+
+        return res
+    
+    def sort_detail_values(self, detail_values):
         # Ordeno por fecha, tipo y nombre según las claves de los dict
         # devueltos por _get_invoice_values y _get_retention_values
-        res = sorted(res, key=lambda x: (x.get(0), x.get(4), x.get(5)))
-        return res
+        return sorted(detail_values, key=lambda x: (x.get(0), x.get(4), x.get(5)))
 
     def get_report_values(self):
         """
@@ -277,12 +280,14 @@ class WizardVatDiary(models.TransientModel):
             taxes_position = self._get_taxes_position(invoices, retentions)
             header = self.get_header_values(taxes_position)
             details = self.get_details_values(taxes_position, invoices, retentions)
+            details = self.sort_detail_values(details)
         else:
             if not invoices:
                 raise ValidationError("No se han encontrado documentos para ese rango de fechas")
             taxes_position = self._get_taxes_position(invoices)
             header = self.get_header_values(taxes_position)
             details = self.get_details_values(taxes_position, invoices)
+            details = self.sort_detail_values(details)
 
         return [header] + details
 
@@ -348,16 +353,6 @@ class WizardVatDiary(models.TransientModel):
             'url': '/web/binary/download_vat_diary?wizard_id=%s&filename=%s' % (self.id, filename + '.xls'),
             'target': 'new',
         }
-
-    @staticmethod
-    def _get_invoice_currency_rate(invoice):
-        """ Calculo el rate de la factura """
-        rate = 1
-        if (invoice.company_id.currency_id != invoice.currency_id) and invoice.line_ids:
-            move = invoice.line_ids[0]
-            if move.amount_currency != 0:
-                rate = abs((move.credit + move.debit) / move.amount_currency)
-        return rate
 
 class WizardVatDiaryRoute(http.Controller):
     @http.route('/web/binary/download_vat_diary', type='http', auth="public")

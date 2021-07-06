@@ -34,10 +34,20 @@ class PerceptionSifere(models.Model):
         return rate
 
     def _get_tipo(self, p):
-        if p.move_id.type == 'in_invoice':
+        if p.move_id.type in ['in_invoice', 'in_refund'] and \
+                p.move_id.voucher_type_id.denomination_id == self.env.ref('l10n_ar_afip_tables.account_denomination_o'):
+            return 'O'
+        elif p.move_id.type == 'in_invoice':
             return 'D' if p.move_id.voucher_type_id.is_debit_note else 'F'
         else:
             return 'C'
+
+    def _get_denomination(self, p):
+        if p.move_id.type in ['in_invoice', 'in_refund'] and \
+                p.move_id.voucher_type_id.denomination_id == self.env.ref('l10n_ar_afip_tables.account_denomination_o'):
+            return ' '
+        else:
+            return p.move_id.voucher_type_id.denomination_id.name
 
     def _get_invalid_denomination(self):
         return self.env.ref('l10n_ar_afip_tables.account_denomination_d').name
@@ -53,16 +63,23 @@ class PerceptionSifere(models.Model):
         return partner.partner_document_type_id != self.env.ref('l10n_ar_afip_tables.partner_document_type_80')
 
     def create_line(self, code, lines, p):
+        factor = 1
+        if p.move_id.type in ['out_refund', 'in_refund']:
+            factor = -1
         line = lines.create_line()
         line.jurisdiccion = code
         vat = p.move_id.partner_id.vat
         line.cuit = "{0}-{1}-{2}".format(vat[0:2], vat[2:10], vat[-1:])
         line.fecha = (p.move_id.date or p.move_id.invoice_date).strftime('%d/%m/%Y')
-        line.puntoDeVenta = p.move_id.voucher_name[0:4]
-        line.numeroComprobante = p.move_id.voucher_name[5:]
+        split_voucher_name = p.move_id.voucher_name.split('-')
+        if split_voucher_name and any(not l.isdigit() for l in split_voucher_name):
+            msg = "La factura {} contiene caracteres inválidos (solamente se permiten números y guiones)"
+            raise ValidationError(msg.format(p.move_id.name))
+        line.puntoDeVenta = split_voucher_name[0][-4:] if len(split_voucher_name) > 1 else '0'.zfill(4)
+        line.numeroComprobante = split_voucher_name[1][:8] if len(split_voucher_name) > 1 else p.move_id.voucher_name[-8:]
         line.tipo = self._get_tipo(p)
-        line.letra = p.move_id.voucher_type_id.denomination_id.name
-        line.importe = '{0:.2f}'.format(p.amount * self._get_invoice_currency_rate(p.move_id)).replace('.', ',')
+        line.letra = self._get_denomination(p)
+        line.importe = '{0:.2f}'.format(p.amount * self._get_invoice_currency_rate(p.move_id) * factor).replace('.', ',')
 
     def generate_file(self):
         lines = presentation.Presentation("sifere", "percepciones")
@@ -98,7 +115,12 @@ class PerceptionSifere(models.Model):
             # pero que siga revisando las percepciones por si hay mas errores, para mostrarlos todos juntos
             if missing_vats or invalid_doctypes or invalid_vats or missing_codes:
                 continue
-            self.create_line(code, lines, p)
+            try:
+                self.create_line(code, lines, p)
+            except ValidationError as e:
+                raise e
+            except Exception as e:
+                raise ValidationError(e)
 
         if missing_vats or invalid_doctypes or invalid_vats or missing_codes:
             errors = []

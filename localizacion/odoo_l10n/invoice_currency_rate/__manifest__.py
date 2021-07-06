@@ -20,7 +20,7 @@
 
     'name': 'Invoice currency rate',
 
-    'version': '1.0.1',
+    'version': '1.0.2',
 
     'category': 'Accounting',
 

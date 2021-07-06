@@ -20,7 +20,7 @@
 
     'name': 'l10n_ar_stock',
 
-    'version': '1.0',
+    'version': '1.1.1',
 
     'summary': 'Punto de venta en remitos',
 

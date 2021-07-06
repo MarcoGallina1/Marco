@@ -35,6 +35,7 @@
     'depends': [
         'l10n_ar_stock',
         'sale_stock',
+        'l10n_ar_point_of_sale_common_report'
     ],
 
     'data': [

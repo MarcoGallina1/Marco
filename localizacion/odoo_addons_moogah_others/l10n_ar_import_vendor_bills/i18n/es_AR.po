@@ -1,0 +1,294 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* l10n_ar_import_vendor_bills
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 13.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-02-25 19:53+0000\n"
+"PO-Revision-Date: 2021-02-25 17:07-0300\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.4.2\n"
+"Last-Translator: \n"
+"Language: es_AR\n"
+
+#. module: l10n_ar_import_vendor_bills
+#: model_terms:ir.ui.view,arch_db:l10n_ar_import_vendor_bills.res_config_settings_view_form2
+msgid ""
+"<span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-"
+"specific.\" aria-label=\"Values set here are company-specific.\" groups="
+"\"base.group_multi_company\" role=\"img\"/>"
+msgstr ""
+"<span class=\"fa fa-lg fa-building-o\" title=\"Los valores de esta sección "
+"son por compañía.\" aria-label=\"Values set here are company-specific.\" "
+"groups=\"base.group_multi_company\" role=\"img\"/>"
+
+#. module: l10n_ar_import_vendor_bills
+#: model_terms:ir.ui.view,arch_db:l10n_ar_import_vendor_bills.res_config_settings_view_form2
+msgid ""
+"<span class=\"o_form_label\">Default values</span>\n"
+"                                <span class=\"fa fa-lg fa-building-o\" title="
+"\"Values set here are company-specific.\" aria-label=\"Values set here are "
+"company-specific.\" groups=\"base.group_multi_company\" role=\"img\"/>"
+msgstr ""
+"<span class=\"o_form_label\">Valores por Defecto</span>\n"
+"                                <span class=\"fa fa-lg fa-building-o\" title="
+"\"Values set here are company-specific.\" aria-label=\"Values set here are "
+"company-specific.\" groups=\"base.group_multi_company\" role=\"img\"/>"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_account_move__import_cae
+msgid "CAE/CAI Code"
+msgstr "Código CAE/CAI"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model,name:l10n_ar_import_vendor_bills.model_res_company
+msgid "Companies"
+msgstr "Compañías"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model,name:l10n_ar_import_vendor_bills.model_res_config_settings
+msgid "Config Settings"
+msgstr "Opciones de Configuración"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model,name:l10n_ar_import_vendor_bills.model_res_partner
+msgid "Contact"
+msgstr "Contacto"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_import_vendor_bills__create_uid
+msgid "Created by"
+msgstr "Creado por"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_import_vendor_bills__create_date
+msgid "Created on"
+msgstr "Creado en"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_account_move__import_status
+msgid "Data Status"
+msgstr "Estado de Datos"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_import_vendor_bills__date_from
+msgid "Date From"
+msgstr "Fecha Desde"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_import_vendor_bills__date_to
+msgid "Date To"
+msgstr "Fecha Hasta"
+
+#. module: l10n_ar_import_vendor_bills
+#: model_terms:ir.ui.view,arch_db:l10n_ar_import_vendor_bills.res_config_settings_view_form2
+msgid "Def. TAX for 'Non Taxable Amounts'"
+msgstr "IMP. p/Def. para 'Montos No Gravados'"
+
+#. module: l10n_ar_import_vendor_bills
+#: model_terms:ir.ui.view,arch_db:l10n_ar_import_vendor_bills.res_config_settings_view_form2
+msgid "Def. TAX for 'VAT Exempt'"
+msgstr "IMP. p/Def. para 'IVA Exento'"
+
+#. module: l10n_ar_import_vendor_bills
+#: model_terms:ir.ui.view,arch_db:l10n_ar_import_vendor_bills.res_config_settings_view_form2
+msgid "Def. TAX for FP 'Exempt VAT'"
+msgstr "IMP. p/Def. si Posición Fiscal 'IVA Exento'"
+
+#. module: l10n_ar_import_vendor_bills
+#: model_terms:ir.ui.view,arch_db:l10n_ar_import_vendor_bills.res_config_settings_view_form2
+msgid "Def. TAX for FP 'IVA Resp.Insc.'"
+msgstr "IMP. p/Def. si Posición Fiscal 'IVA Resp. Inc.'"
+
+#. module: l10n_ar_import_vendor_bills
+#: model_terms:ir.ui.view,arch_db:l10n_ar_import_vendor_bills.res_config_settings_view_form2
+msgid "Def. TAX for FP 'Monotribute'"
+msgstr "IMP. p/Def. si Posición Fiscal 'Monotributo'"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_res_company__vat_exempt_id
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_res_config_settings__vat_exempt_id
+msgid "Def. VAT Exempt VAT"
+msgstr "IMP. p/Def. IVA Exento"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_res_company__vat_monotribute_id
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_res_config_settings__vat_monotribute_id
+msgid "Def. VAT Monotribute"
+msgstr "IMP. p/Def. Monotributo"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_res_company__vat_resp_insc_id
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_res_config_settings__vat_resp_insc_id
+msgid "Def. VAT Resp. Insc."
+msgstr "IMP. p/Def. para Resp. Inscriptos"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_res_company__def_expense_product_id
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_res_config_settings__def_expense_product_id
+#: model_terms:ir.ui.view,arch_db:l10n_ar_import_vendor_bills.res_config_settings_view_form2
+msgid "Default Expense Product"
+msgstr "Producto Gastos p/Defecto"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_res_partner__default_product_id
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_res_users__default_product_id
+msgid "Default Product"
+msgstr "Producto p/Defecto"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_import_vendor_bills__display_name
+msgid "Display Name"
+msgstr "Nombre"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_account_move__import_exempt_amount
+msgid "Exempt_amount"
+msgstr "Monto Exento"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_import_vendor_bills__csv_file_name
+msgid "File Name"
+msgstr "Nombre de Archivo"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_import_vendor_bills__id
+msgid "ID"
+msgstr "ID"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_account_move__import_date
+msgid "Import Date"
+msgstr "Fecha de Importación"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.actions.act_window,name:l10n_ar_import_vendor_bills.action_import_vendor_bills
+#: model:ir.ui.menu,name:l10n_ar_import_vendor_bills.menu_import_vendor_bills
+#: model_terms:ir.ui.view,arch_db:l10n_ar_import_vendor_bills.import_vendor_bills_form
+#: model_terms:ir.ui.view,arch_db:l10n_ar_import_vendor_bills.res_config_settings_view_form2
+msgid "Import Vendor Bills"
+msgstr "Importar Facturas de Proveedor"
+
+#. module: l10n_ar_import_vendor_bills
+#: model_terms:ir.ui.view,arch_db:l10n_ar_import_vendor_bills.invoice_supplier_form2
+msgid "Imported Data"
+msgstr "Datos Importados"
+
+#. module: l10n_ar_import_vendor_bills
+#: model_terms:ir.ui.view,arch_db:l10n_ar_import_vendor_bills.view_account_move_filter2
+msgid "Imported From AFIP"
+msgstr "Importados desde AFIP"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_account_move__import_afip_file_flag
+msgid "Imported from AFIP file"
+msgstr "Importados desde archivo AFIP"
+
+#. module: l10n_ar_import_vendor_bills
+#: model_terms:ir.ui.view,arch_db:l10n_ar_import_vendor_bills.view_account_move_filter2
+msgid "Imported from afip"
+msgstr "Importado desde AFIP"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_account_move__import_inv_currrency
+msgid "Invoice Currency"
+msgstr "Moneda Factura"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_account_move__import_inv_type
+msgid "Invoice Type"
+msgstr "Tipo Factura"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model,name:l10n_ar_import_vendor_bills.model_account_move
+msgid "Journal Entries"
+msgstr "Asientos"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_import_vendor_bills____last_update
+msgid "Last Modified on"
+msgstr "Ult. Modificación en"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_import_vendor_bills__write_uid
+msgid "Last Updated by"
+msgstr "Ult. Actualización por"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_import_vendor_bills__write_date
+msgid "Last Updated on"
+msgstr "Ult. Actualización en"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_import_vendor_bills__csv_file
+msgid "Load File"
+msgstr "Subir Archivo"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_account_move__import_non_taxable_nett_amount
+msgid "Non Taxable Nett Amount"
+msgstr "Monto Neto No Gravado"
+
+#. module: l10n_ar_import_vendor_bills
+#: code:addons/l10n_ar_import_vendor_bills/models/models.py:0
+#: model:ir.model.fields.selection,name:l10n_ar_import_vendor_bills.selection__account_move__import_status__pending
+#, python-format
+msgid "Pending Revision"
+msgstr "Pendiente de Revisión"
+
+#. module: l10n_ar_import_vendor_bills
+#: code:addons/l10n_ar_import_vendor_bills/models/models.py:0
+#: model:ir.model.fields.selection,name:l10n_ar_import_vendor_bills.selection__account_move__import_status__revised
+#, python-format
+msgid "Revised"
+msgstr "Revisado"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_account_move__import_user_id
+msgid "Revised by User"
+msgstr "Revisado por Usuario"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_account_move__import_taxable_nett_amount
+msgid "Taxable Nett Amount"
+msgstr "Monto Neto Gravado"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_account_move__import_tot_amount
+msgid "Total Amount"
+msgstr "Monto Total"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_res_company__non_taxable_amount_id
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_res_config_settings__non_taxable_amount_id
+msgid "VAT Code Non Taxable Amounts"
+msgstr "Cód. IVA Montos No Gravados"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_res_company__exempt_amount_id
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_res_config_settings__exempt_amount_id
+msgid "VAT code for Exempt Values"
+msgstr "Cód. IVA Valores Exentos"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model.fields,field_description:l10n_ar_import_vendor_bills.field_account_move__import_vat_amount
+msgid "Vat Amount"
+msgstr "Monto IVA"
+
+#. module: l10n_ar_import_vendor_bills
+#: code:addons/l10n_ar_import_vendor_bills/models/models.py:0
+#, python-format
+msgid "at least fill default product code in settings"
+msgstr ""
+"es necesario completar el código de producto por defecto en la configuración"
+
+#. module: l10n_ar_import_vendor_bills
+#: model:ir.model,name:l10n_ar_import_vendor_bills.model_import_vendor_bills
+msgid "import.vendor.bills"
+msgstr ""

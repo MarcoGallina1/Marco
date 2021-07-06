@@ -60,7 +60,7 @@ class PurchaseIvaPresentation(PurchaseVatPresentation):
             line.numeroComprobante = invoice_number
             line.codigoDocVend = document_code
             line.numeroIdVend = supplier_doc
-            line.importeNetoGravado = self.get_importeNetoGravado(tax)
+            line.importeNetoGravado = self.get_importeNetoGravado(invoice, tax)
             line.alicuotaIva = self.get_alicuotaIva(tax)
             line.impuestoLiquidado = self.get_impuestoLiquidado(tax)
 

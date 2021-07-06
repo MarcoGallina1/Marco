@@ -41,6 +41,18 @@
             <field name='foo'>action_electronic_exportation</field>
         </record>
 
+        <record id='document_book_type_fiscal_electronic_bond' model='document.book.type'>
+            <field name='type'>fiscal_electronic_bond</field>
+            <field name='category'>invoice</field>
+            <field name='foo'>action_fiscal_electronic_bond</field>
+        </record>
+
+        <record id='document_book_type_fiscal_electronic_bond_refund' model='document.book.type'>
+            <field name='type'>fiscal_electronic_bond</field>
+            <field name='category'>refund</field>
+            <field name='foo'>action_fiscal_electronic_bond</field>
+        </record>
+
     </data>
 </odoo>
 

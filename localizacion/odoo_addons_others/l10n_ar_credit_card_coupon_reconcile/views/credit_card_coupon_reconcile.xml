@@ -157,9 +157,10 @@
         <field name="name">credit_card_coupon_reconcile_tree</field>
         <field name="model">credit.card.coupon.reconcile</field>
         <field name="arch" type="xml">
-            <tree string="Liquidaciones" create="false" decoration-info="state=='draft'" decoration-success="state=='done'">
+            <tree string="Liquidaciones" create="false" decoration-info="state=='draft'" decoration-success="state=='done'" default_order="acreditation_date desc">
                 <field name="name"/>
                 <field name="journal_id"/>
+                <field name="acreditation_date"/>
                 <field name="coupons_total" sum="Total cupones"/>
                 <field name="credited_total" sum="Total "/>
                 <field name="state"/>

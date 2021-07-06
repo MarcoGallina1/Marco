@@ -19,7 +19,7 @@
 {
 	'name' : 'Partner Address extension',
 
-	'version': '1.0',
+	'version': '1.1.0',
 
 	'author' : 'BLUEORANGE GROUP S.R.L.',
 

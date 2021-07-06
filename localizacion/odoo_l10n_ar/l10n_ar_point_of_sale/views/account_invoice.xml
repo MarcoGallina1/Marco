@@ -41,7 +41,8 @@
                         readonly="1"
                     />
                     <field name="jurisdiction_id"
-                           attrs="{'invisible': [('type', 'not in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund'])]}"/>
+                           attrs="{'invisible': [('type', 'not in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund'])],
+                                   'readonly': [('state', '!=', 'draft')]}"/>
                 </field>
                 <sheet position="inside">
                     <field name="is_debit_note" invisible="1"/>

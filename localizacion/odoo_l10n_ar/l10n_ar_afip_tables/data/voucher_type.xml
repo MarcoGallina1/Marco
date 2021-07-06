@@ -135,7 +135,6 @@
         <record id='afip_voucher_type_014' model='voucher.type'>
             <field name="code">014</field>
             <field name='name'>DOCUMENTO ADUANERO</field>
-            <field name='denomination_id' ref='account_denomination_o'/>
             <field name='category'>invoice</field>
             <field name='active'>True</field>
         </record>
@@ -381,7 +380,7 @@
         <record id='afip_voucher_type_066' model='voucher.type'>
             <field name="code">066</field>
             <field name='name'>DESPACHO DE IMPORTACION</field>
-            <field name='denomination_id' ref='account_denomination_i'/>
+            <field name='denomination_id' ref='account_denomination_d'/>
             <field name="prefix">DI</field>
             <field name='category'>invoice</field>
             <field name='active'>True</field>
@@ -390,7 +389,7 @@
         <record id='afip_voucher_type_067' model='voucher.type'>
             <field name="code">067</field>
             <field name='name'>IMPORTACION DE SERVICIOS</field>
-            <field name='denomination_id' ref='account_denomination_i'/>
+            <field name='denomination_id' ref='account_denomination_d'/>
             <field name='category'>invoice</field>
             <field name='active'>True</field>
         </record>

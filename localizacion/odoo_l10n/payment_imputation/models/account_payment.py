@@ -77,7 +77,6 @@ class AccountPayment(models.Model):
         active_model = self._context.get('active_model')
         if not active_ids or active_model != 'account.move':
             return rec
-        self.payment_imputation_ids = [(6, 0, [])]
         lines = self.env['account.move'].browse(active_ids).mapped('line_ids').filtered(
             lambda r: not r.reconciled and r.account_id.internal_type in ('payable', 'receivable')
         )
@@ -86,7 +85,8 @@ class AccountPayment(models.Model):
             'amount': abs(line.amount_residual),
             'concile': True,
         }) for line in lines]
-        self.payment_imputation_ids = debit_lines
+        if not self.payment_imputation_ids:
+            self.payment_imputation_ids = debit_lines
 
         return rec
 

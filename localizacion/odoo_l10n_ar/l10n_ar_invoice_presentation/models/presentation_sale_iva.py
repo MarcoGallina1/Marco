@@ -76,7 +76,7 @@ class SaleVatInvoicePresentation(SalePresentation):
             ).mapped('price_subtotal')
         )
 
-        return self.helper.format_amount(base * self.rate)
+        return self.helper.format_amount(base)
 
     def get_alicuotaIva(self, tax):
         """

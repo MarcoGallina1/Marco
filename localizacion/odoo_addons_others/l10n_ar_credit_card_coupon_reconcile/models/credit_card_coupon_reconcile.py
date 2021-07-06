@@ -186,11 +186,6 @@ class CreditCardCouponReconcile(models.Model):
         for line in lines:
             getattr(self, line).unlink()
 
-    @api.constrains("credited_total")
-    def check_credited_total_negative(self):
-        if any(reconcile.credited_total < 0 for reconcile in self):
-            raise ValidationError("¡El monto a cobrar debe ser positivo!")
-
     def compute_document_to_create(self):
         for reconcile in self:
             if any(not getattr(reconcile, field) for field in reconcile.get_documents_fields()):
@@ -255,7 +250,8 @@ class CreditCardCouponReconcile(models.Model):
         for reconcile in self:
             amounts = reconcile.get_tax_lines_amounts()
             amounts.extend(reconcile.get_retention_lines_amounts())
-            reconcile.credited_total = reconcile.coupons_total - sum(amounts)
+            reconcile.credited_total = reconcile.coupons_total - sum(amounts) if reconcile.coupons_total >= 0 \
+                else reconcile.coupons_total + sum(amounts)
 
     def validate_documents_fields(self):
         for reconcile in self:
@@ -315,10 +311,6 @@ class CreditCardCouponReconcile(models.Model):
         if any(not reconcile.tax_line_ids for reconcile in self):
             raise ValidationError("Debe completar la grilla de 'Gastos bancarios' de la página 'Datos fiscales'.")
 
-    def validate_retention_lines(self):
-        if any(not reconcile.retention_line_ids for reconcile in self):
-            raise ValidationError("Debe completar la grilla de 'Retenciones' de la página 'Datos fiscales'.")
-
     def validate_documents_data_fields(self):
         for reconcile in self:
             if any(not getattr(reconcile, field) for field in reconcile.get_documents_data_fields()):
@@ -330,7 +322,6 @@ class CreditCardCouponReconcile(models.Model):
             raise ValidationError("La liquidación debe estar en estado 'Borrador' o 'A validar' para crear sus documentos.")
         self.validate_documents_data_fields()
         self.validate_tax_lines()
-        self.validate_retention_lines()
         self.create_documents()
 
     def get_in_invoice_perception_vals(self):
@@ -351,7 +342,7 @@ class CreditCardCouponReconcile(models.Model):
     def get_invoice_line_vals(self, name, price_unit, product=None, account=None, tax=None):
         vals = {
             'name': name,
-            'price_unit': price_unit,
+            'price_unit': abs(price_unit),
             'quantity': 1,
         }
         if product:
@@ -366,7 +357,7 @@ class CreditCardCouponReconcile(models.Model):
         return {
             'name': perception.name,
             'perception_id': perception.id,
-            'amount': amount,
+            'amount': abs(amount),
             'jurisdiction': perception.jurisdiction
         }
 
@@ -376,6 +367,7 @@ class CreditCardCouponReconcile(models.Model):
             'type': type,
             'partner_id': self.partner_id.id,
             'invoice_date': self.acreditation_date,
+            'date': self.acreditation_date,
         }
         if type == 'in_invoice':
             vals['journal_id'] = self.purchase_journal_id.id
@@ -395,7 +387,7 @@ class CreditCardCouponReconcile(models.Model):
         return {
             'journal_id': journal.id,
             'retention_id': retention.id,
-            'amount': amount,
+            'amount': abs(amount),
             'certificate_no': self.name,
             'jurisdiction': retention.jurisdiction,
             'date': self.acreditation_date
@@ -405,13 +397,13 @@ class CreditCardCouponReconcile(models.Model):
         return {
             'name': journal.name,
             'journal_id': journal.id,
-            'amount': amount
+            'amount': abs(amount),
         }
 
     def get_payment_imputation_vals(self, move_line, amount):
         return {
             'move_line_id': move_line.id,
-            'amount': amount,
+            'amount': abs(amount),
             'concile': True
         }
 
@@ -420,7 +412,7 @@ class CreditCardCouponReconcile(models.Model):
             'journal_id': journal_id.id,
             'partner_id': self.partner_id.id,
             'payment_type': type,
-            'amount': amount,
+            'amount': abs(amount),
             'payment_date': self.acreditation_date,
             'communication': self.name,
             'payment_method_id': journal_id.inbound_payment_method_ids[0].id
@@ -443,10 +435,12 @@ class CreditCardCouponReconcile(models.Model):
             # SE COMPLETAN Y CREAN LOS COMPROBANTES
             if not each.in_invoice_id:
                 in_invoice_vals = each.get_move_vals('in_invoice')
-                in_invoice_vals['invoice_line_ids'] = each.get_in_invoice_line_vals()
-                in_invoice_vals['perception_ids'] = each.get_in_invoice_perception_vals()
+                if each.credited_total < 0:
+                    in_invoice_vals['type'] = 'in_refund'
                 in_invoice = account_move_proxy.with_context(force_company=each.company_id.id).create(in_invoice_vals)
                 in_invoice._onchange_partner_id()
+                in_invoice.write({'invoice_line_ids': each.get_in_invoice_line_vals(),
+                                  'perception_ids': each.get_in_invoice_perception_vals()})
                 # Ejecuto el onchange de las percepciones para que estas se asignen a las líneas de facturas
                 in_invoice.onchange_perception_ids()
                 # Escribo la posición fiscal y el tipo de comprobante para asegurarme de que sean de tipo "O"
@@ -457,24 +451,32 @@ class CreditCardCouponReconcile(models.Model):
                 each.in_invoice_id = in_invoice
 
             if not each.supplier_payment_id:
+                if not each.supplier_journal_id.pos_ar_id:
+                    raise ValidationError('El diario de pago de proveedor tiene que tener un punto de venta asociado.')
                 supplier_payment_vals = self.get_payment_vals('outbound', each.supplier_journal_id, round(supplier_voucher_amount, 4))
+                if each.credited_total < 0:
+                    supplier_payment_vals['payment_type'] = 'inbound'
                 move_line = each.in_invoice_id.line_ids.filtered(lambda aml: aml.account_id.user_type_id.type == 'payable')[0]
                 supplier_payment_vals['payment_imputation_ids'] = [(0,0, self.get_payment_imputation_vals(move_line, round(supplier_voucher_amount, 4)))]
                 supplier_payment = account_payment_proxy.with_context(force_company=each.company_id.id).create(supplier_payment_vals)
                 each.supplier_payment_id = supplier_payment
 
             if not each.out_receipt_id:
-                out_receipt_vals = each.get_move_vals('out_receipt')
+                out_receipt_vals = each.get_move_vals('out_receipt' if each.credited_total >= 0 else 'in_receipt')
                 out_receipt_vals['invoice_line_ids'] = [(0,0, each.get_invoice_line_vals('TOTAL CUPONES', each.coupons_total,
                                                                                         account=each.coupons_account_id))]
                 out_receipt = account_move_proxy.with_context(force_company=each.company_id.id).create(out_receipt_vals)
                 each.out_receipt_id = out_receipt
 
             if not each.customer_payment_id:
+                if not each.customer_multiple_journal_id.pos_ar_id:
+                    raise ValidationError('El diario de pago de cliente tiene que tener un punto de venta asociado.')
                 customer_payment_vals = self.get_payment_vals('inbound', each.customer_multiple_journal_id, each.coupons_total)
-                move_line = each.out_receipt_id.line_ids.filtered(lambda aml: aml.account_id.user_type_id.type == 'receivable')[0]
+                if each.credited_total < 0:
+                    customer_payment_vals['payment_type'] = 'outbound'
+                move_line = each.out_receipt_id.line_ids.filtered(lambda aml: aml.account_id.user_type_id.type == ('receivable' if each.credited_total >= 0 else 'payable'))[0]
                 customer_payment_vals['payment_imputation_ids'] = [(0,0, self.get_payment_imputation_vals(move_line, each.coupons_total))]
-                customer_payment_vals['payment_type_line_ids'] = [(0,0, self.get_payment_type_line_vals(each.receivable_journal_id,  each.coupons_total - retention_total))]
+                customer_payment_vals['payment_type_line_ids'] = [(0,0, self.get_payment_type_line_vals(each.receivable_journal_id, abs(each.coupons_total) - retention_total))]
                 customer_payment_vals['retention_ids'] = self.get_customer_payment_retention_vals()
                 customer_payment = account_payment_proxy.with_context(force_company=each.company_id.id).create(customer_payment_vals)
                 # Ejecuto el onchange de las cotizaciones y los montos para que se carguen en los métodos de pago

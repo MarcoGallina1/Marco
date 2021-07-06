@@ -17,6 +17,7 @@
 ##############################################################################
 
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 RETENTION_TYPE_CODES = {
     'profit': 'profit',
@@ -40,10 +41,13 @@ class AccountPayment(models.Model):
         self.recalculate_payment_amount()
 
     def post(self):
-        for rec in self.search([('partner_type', '=', 'supplier')]):
+        for rec in self.filtered(lambda ap: ap.partner_type == 'supplier'):
             for ret in rec.retention_ids.filtered(lambda x: not x.certificate_no):
                 ret.certificate_no = self.env['ir.sequence'].next_by_code(
                     'rtl.{}.seq'.format(RETENTION_TYPE_CODES.get(ret.retention_id.type)))
+                if not ret.certificate_no:
+                    raise ValidationError("No se encontró secuencia para la retencion: {RETENCION}".format(
+                        RETENCION=ret.retention_id.name))
         return super(AccountPayment, self).post()
 
     def get_payment_line_fields(self):

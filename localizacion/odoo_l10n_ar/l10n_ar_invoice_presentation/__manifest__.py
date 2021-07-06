@@ -20,7 +20,7 @@
 
     'name': 'Account invoice presentation',
 
-    'version': '1.0',
+    'version': '1.1.0',
 
     'category': 'Account',
 
@@ -31,6 +31,7 @@
     'website': 'https://www.blueorange.com.ar',
 
     'depends': [
+        'l10n_ar_importations',
         'l10n_ar_perceptions',
     ],
 

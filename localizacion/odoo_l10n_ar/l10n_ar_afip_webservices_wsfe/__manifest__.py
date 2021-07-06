@@ -20,7 +20,7 @@
 
     'name': 'l10n_ar_afip_webservices_wsfe',
 
-    'version': '1.0',
+    'version': '1.1.0',
 
     'category': 'Localization',
 
@@ -38,12 +38,14 @@
     ],
 
     'data': [
-        'views/account_invoice_view.xml',
+        'views/account_move.xml',
+        'views/product_product.xml',
         'views/res_currency_view.xml',
         'views/wsfe_configuration_view.xml',
         'views/wsfe_request_detail_view.xml',
         'security/ir.model.access.csv',
         'data/document_book_type.xml',
+        'data/ncm_types.xml',
         'data/security.xml',
         'data/ir_cron.xml',
     ],

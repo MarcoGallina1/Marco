@@ -16,7 +16,7 @@
 
 <odoo>
 
-    <data>
+    <data noupdate="1">
 
         <!-- Configuracion de Percepciones (perception.perception.template) -->
 

@@ -26,18 +26,23 @@ class RetentionRetention(models.Model):
     _description = 'Retención'
 
     def get_retention_groups(self):
-        return self.get_retention_iibb_groups() | \
+        return self.get_retention_gross_income_groups() | \
                self.get_retention_vat_groups() | \
                self.get_retention_profit_groups()
 
-    def get_retention_iibb_groups(self):
-        return self.env.ref('l10n_ar.tax_group_retention_iibb_caba', None) | \
-               self.env.ref('l10n_ar.tax_group_retention_iibb_pba', None)
+    def get_retention_gross_income_groups(self):
+        return self.env['retention.retention'].search([
+            ('type', '=', 'gross_income')
+        ]).mapped('tax_id.tax_group_id')
 
     def get_retention_vat_groups(self):
-        return self.env.ref('l10n_ar.tax_group_retention_vat', None)
+        return self.env['retention.retention'].search([
+            ('type', '=', 'vat')
+        ]).mapped('tax_id.tax_group_id')
 
     def get_retention_profit_groups(self):
-        return self.env.ref('l10n_ar.tax_group_retention_profit', None)
+        return self.env['retention.retention'].search([
+            ('type', '=', 'profit')
+        ]).mapped('tax_id.tax_group_id')
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

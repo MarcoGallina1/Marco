@@ -44,7 +44,7 @@ class AccountThirdCheck(models.Model):
         if any(check.state == 'draft' for check in self):
             raise ValidationError("No se puede rechazar un cheque en borrador.")
         for check in self:
-            # Se puede pasar a rechazado desde cartera, entregado o depositado
+            # Se puede pasar a rechazado desde cartera, entregado, depositado o vendido
             check.next_state(check.state if check.state != 'wallet' else 'wallet_rejected')
 
     def revert_reject(self):
@@ -61,6 +61,10 @@ class AccountThirdCheck(models.Model):
             elif check.destination_payment_id and check.destination_payment_id.state != 'draft':
                 check.cancel_state('rejected_handed')
 
+            # Si antes de rechazarse estaba vendido
+            elif check.sold_check_id:
+                check.cancel_state('rejected_sold')
+
             # Si no estaba depositado o entregado, debería volver a cartera
             else:
                 check.cancel_state('rejected_wallet')
@@ -70,6 +74,7 @@ class AccountThirdCheck(models.Model):
         res['rejected_wallet'] = 'wallet'
         res['rejected_handed'] = 'handed'
         res['rejected_deposited'] = 'deposited'
+        res['rejected_sold'] = 'sold'
         return res
 
     def get_next_states(self):
@@ -77,6 +82,7 @@ class AccountThirdCheck(models.Model):
         res['wallet_rejected'] = 'rejected'
         res['handed'] = 'rejected'
         res['deposited'] = 'rejected'
+        res['sold'] = 'rejected'
         return res
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

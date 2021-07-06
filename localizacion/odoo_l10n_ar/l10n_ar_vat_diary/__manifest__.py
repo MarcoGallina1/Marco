@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- encoding: utf-8 -*-
 ##############################################################################
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 
     'name': 'l10n_ar_vat_diary',
 
-    'version': '1.0',
+    'version': '1.2.0',
 
     'category': 'Accounting',
 
@@ -35,6 +35,7 @@
     ],
 
     'data': [
+        'views/account_fiscal_position.xml',
         'wizard/wizard_vat_diary_view.xml',
     ],
 

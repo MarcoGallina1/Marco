@@ -127,5 +127,11 @@ class AccountPaymentRetention(models.Model):
     def validate_journal_accounts(self):
         """ En retenciones las cuentas contables se obtienen del impuesto """
         return True
+    
+    def get_move_vals(self, payment):
+        """ En retenciones la fecha del asiento contable debe ser la fecha de la retención """
+        vals = super().get_move_vals(payment)
+        vals['date'] = self.date
+        return vals
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

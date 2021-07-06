@@ -33,10 +33,10 @@ def get_accumulated_payments(model, partner, date):
     payments = model.env['account.payment'].search([
         ('payment_type', '=', 'outbound'),
         ('partner_id', '=', partner.id),
-        ('state', 'not in', ['draft', 'sent']),
+        ('state', 'not in', ['draft', 'cancelled']),
         ('payment_date', '>=', fields.Date.to_string(date.replace(day=1))),
         ('payment_date', '<', fields.Date.to_string(date.replace(day=1) + relativedelta(months=1))),
-        ('company_id', '<', model.env.company.id),
+        ('company_id', '=', model.company_id.id or model.env.company.id),
     ])
 
     return payments
@@ -60,23 +60,32 @@ class AccountPayment(models.AbstractModel):
         """
         self.ensure_one()
 
+        retention_currency = self.company_id.account_payment_retention_journal_id.currency_id.id or \
+            self.company_id.currency_id
+
         amount = self.currency_id._convert(
             self.advance_amount,
-            self.company_id.currency_id,
+            retention_currency,
             self.company_id,
             self.payment_date
         ) if self.advance_amount else 0.0
 
         for imputation in self.payment_imputation_ids:
             invoice = imputation.move_line_id.move_id
+            imputation_amount = imputation.currency_id._convert(
+                imputation.amount,
+                retention_currency,
+                self.company_id,
+                self.payment_date
+            )
             # Para facturas A retenemos importes gravados o exentos, si no, el total.
             if invoice and invoice.voucher_type_id.denomination_id.vat_discriminated:
                 if invoice.amount_to_tax or invoice.amount_exempt:
-                    amount += imputation.amount_total_company /\
+                    amount += imputation_amount /\
                               (invoice.amount_total / (invoice.amount_to_tax + invoice.amount_exempt))
             else:
                 # Si no tiene factura solo me interesa el total imputado
-                amount += imputation.amount_total_company
+                amount += imputation_amount
 
         return amount
 
@@ -111,11 +120,11 @@ class AccountPayment(models.AbstractModel):
                     retentions.append((0, 0, vals))
 
             payment.retention_ids = retentions
-            payment.onchange_retention_ids()
             # Actualizamos los valores en los casos que haya cotizacion
             for retention in payment.retention_ids:
                 retention.onchange_update_rate()
                 retention.onchange_amount()
+            payment.onchange_retention_ids()
 
     def _create_retention(self, base, amount, retention):
         """ Crea una linea de retencion en el pago """
@@ -123,11 +132,7 @@ class AccountPayment(models.AbstractModel):
         vals = {
             'base': base,
             'aliquot': round((amount/base)*100 if base else 0.0, 2),
-            'journal_id': self.env['account.journal'].search([
-                ('type', 'in', ['bank', 'cash']),
-                ('currency_id', '=', None)],
-                limit=1
-            ).id,  # TODO: SI LLEGA A PROD CON ESTO GOLPEAR A DANI
+            'journal_id': retention.company_id.account_payment_retention_journal_id.id,
             'amount': round(amount, 2),
             'retention_id': retention.id,
             'name': retention.name,

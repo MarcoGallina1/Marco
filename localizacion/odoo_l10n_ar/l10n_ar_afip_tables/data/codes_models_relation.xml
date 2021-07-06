@@ -106,6 +106,32 @@
             <field name='code'>6</field>
         </record>
 
+        <record id='codes_models_afip_account_tax_8_sale' model='codes.models.relation'>
+            <field name='name'>Afip</field>
+            <field name='name_model'>account.tax</field>
+            <field name='id_model' model="account.tax" search="[
+                ('tax_group_id', '=', ref('l10n_ar.tax_group_vat_5')),
+                ('type_tax_use', '=', 'sale'),
+                '|',
+                ('active', '=', False),
+                ('active', '=', True),
+            ]"/>
+            <field name='code'>8</field>
+        </record>
+
+        <record id='codes_models_afip_account_tax_9_sale' model='codes.models.relation'>
+            <field name='name'>Afip</field>
+            <field name='name_model'>account.tax</field>
+            <field name='id_model' model="account.tax" search="[
+                ('tax_group_id', '=', ref('l10n_ar.tax_group_vat_2_5')),
+                ('type_tax_use', '=', 'sale'),
+                '|',
+                ('active', '=', False),
+                ('active', '=', True),
+            ]"/>
+            <field name='code'>9</field>
+        </record>
+
         <!-- COMPRAS -->
         <record id='codes_models_afip_account_tax_1_purchase' model='codes.models.relation'>
             <field name='name'>Afip</field>
@@ -186,6 +212,32 @@
                 ('active', '=', True),
             ]"/>
             <field name='code'>6</field>
+        </record>
+
+        <record id='codes_models_afip_account_tax_8_purchase' model='codes.models.relation'>
+            <field name='name'>Afip</field>
+            <field name='name_model'>account.tax</field>
+            <field name='id_model' model="account.tax" search="[
+                ('tax_group_id', '=', ref('l10n_ar.tax_group_vat_5')),
+                ('type_tax_use', '=', 'purchase'),
+                '|',
+                ('active', '=', False),
+                ('active', '=', True),
+            ]"/>
+            <field name='code'>8</field>
+        </record>
+
+        <record id='codes_models_afip_account_tax_9_purchase' model='codes.models.relation'>
+            <field name='name'>Afip</field>
+            <field name='name_model'>account.tax</field>
+            <field name='id_model' model="account.tax" search="[
+                ('tax_group_id', '=', ref('l10n_ar.tax_group_vat_2_5')),
+                ('type_tax_use', '=', 'purchase'),
+                '|',
+                ('active', '=', False),
+                ('active', '=', True),
+            ]"/>
+            <field name='code'>9</field>
         </record>
 
     </data>

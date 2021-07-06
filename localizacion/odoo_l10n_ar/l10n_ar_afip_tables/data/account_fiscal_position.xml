@@ -85,6 +85,10 @@
         <record id='account_fiscal_position_other' model='account.fiscal.position'>
             <field name='name'>Otro</field>
         </record>
+
+        <record id='account_fiscal_position_aduana' model='account.fiscal.position'>
+            <field name='name'>Aduana</field>
+        </record>
         
         <!-- CREACION DE LA RELACION CON CODES_MODELS -->
 

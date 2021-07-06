@@ -50,7 +50,7 @@
             <field name="name">perception.sifere.tree</field>
             <field name="model">perception.sifere</field>
             <field name="arch" type="xml">
-                <tree string="SIFERE Percepciones">
+                <tree string="SIFERE Percepciones" default_order="date_from desc">
                     <field name="name"/>
                     <field name="company_id" groups="base.group_multi_company"/>
                     <field name="date_from"/>

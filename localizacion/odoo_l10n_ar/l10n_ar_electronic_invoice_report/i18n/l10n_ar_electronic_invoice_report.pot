@@ -57,6 +57,11 @@ msgstr ""
 
 #. module: l10n_ar_electronic_invoice_report
 #: model_terms:ir.ui.view,arch_db:l10n_ar_electronic_invoice_report.report_electronic_invoice_header
+msgid "<b>CUSTOMER REFERENCE: </b>"
+msgstr ""
+
+#. module: l10n_ar_electronic_invoice_report
+#: model_terms:ir.ui.view,arch_db:l10n_ar_electronic_invoice_report.report_electronic_invoice_header
 msgid "<b>CUSTOMER: </b>"
 msgstr ""
 

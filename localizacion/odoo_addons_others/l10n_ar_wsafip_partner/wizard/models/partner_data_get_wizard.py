@@ -132,6 +132,8 @@ class PartnerDataGetWizard(models.TransientModel):
                     id_pos_fiscal = self.env.ref('l10n_ar_afip_tables.account_fiscal_position_ex').id
                 else:
                     id_pos_fiscal = self.env.ref('l10n_ar_afip_tables.account_fiscal_position_cf').id
+            elif data.datosGenerales:
+                id_pos_fiscal = self.env.ref('l10n_ar_afip_tables.account_fiscal_position_cf').id
 
         return id_pos_fiscal
 

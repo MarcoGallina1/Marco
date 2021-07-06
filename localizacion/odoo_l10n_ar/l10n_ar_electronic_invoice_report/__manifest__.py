@@ -20,7 +20,7 @@
 
     'name': 'l10n_ar_electronic_invoice_report',
 
-    'version': '1.0',
+    'version': '1.0.2',
 
     'description': 'Reporte para facturación electrónica',
 
@@ -35,6 +35,7 @@
     'depends': [
 
         'l10n_ar_afip_webservices_wsfe',
+        'l10n_ar_point_of_sale_common_report'
         #'report_custom_filename' TODO: mirar v10 de este modulo, es para que el reporte tenga el nombre del numero de doc
     ],
 

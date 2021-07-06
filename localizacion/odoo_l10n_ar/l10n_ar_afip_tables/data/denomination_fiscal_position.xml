@@ -347,64 +347,127 @@
         </record>
         
         <!--PROVEEDOR DEL EXTERIOR-->
-        <record id="fpos_prov_ext_to_ivari" model="denomination.fiscal.position">
+
+        <record id="fpos_prov_ext_to_ivari_den_o" model="denomination.fiscal.position">
             <field name="issue_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_prov_ext"/>
             <field name="receipt_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_ivari"/>
-            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_i"/>
+            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_o"/>
         </record>
 
-        <record id="fpos_prov_ext_to_ivanor" model="denomination.fiscal.position">
+        <record id="fpos_prov_ext_to_ivanor_den_o" model="denomination.fiscal.position">
             <field name="issue_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_prov_ext"/>
             <field name="receipt_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_ivanor"/>
-            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_i"/>
+            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_o"/>
         </record>
         
-        <record id="fpos_prov_ext_to_ex" model="denomination.fiscal.position">
+        <record id="fpos_prov_ext_to_ex_den_o" model="denomination.fiscal.position">
             <field name="issue_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_prov_ext"/>
             <field name="receipt_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_ex"/>
-            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_i"/>
+            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_o"/>
         </record>
         
-        <record id="fpos_prov_ext_to_cf" model="denomination.fiscal.position">
+        <record id="fpos_prov_ext_to_cf_den_o" model="denomination.fiscal.position">
             <field name="issue_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_prov_ext"/>
             <field name="receipt_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_cf"/>
-            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_i"/>
+            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_o"/>
         </record>
         
-        <record id="fpos_prov_ext_to_mon" model="denomination.fiscal.position">
+        <record id="fpos_prov_ext_to_mon_den_o" model="denomination.fiscal.position">
             <field name="issue_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_prov_ext"/>
             <field name="receipt_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_mon"/>
-            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_i"/>
+            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_o"/>
         </record>
         
-        <record id="fpos_prov_ext_to_cliente_ext" model="denomination.fiscal.position">
+        <record id="fpos_prov_ext_to_cliente_ext_den_o" model="denomination.fiscal.position">
             <field name="issue_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_prov_ext"/>
             <field name="receipt_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_cliente_ext"/>
-            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_i"/>
+            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_o"/>
         </record>
         
-        <record id="fpos_prov_ext_to_ivari_perception" model="denomination.fiscal.position">
+        <record id="fpos_prov_ext_to_ivari_perception_den_o" model="denomination.fiscal.position">
             <field name="issue_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_prov_ext"/>
             <field name="receipt_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_ivari_perception"/>
-            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_i"/>
+            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_o"/>
         </record>
         
-        <record id="fpos_prov_ext_to_peq_contr" model="denomination.fiscal.position">
+        <record id="fpos_prov_ext_to_peq_contr_den_o" model="denomination.fiscal.position">
             <field name="issue_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_prov_ext"/>
             <field name="receipt_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_peq_contr"/>
-            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_i"/>
+            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_o"/>
         </record>
         
-        <record id="fpos_prov_ext_to_mono_social" model="denomination.fiscal.position">
+        <record id="fpos_prov_ext_to_mono_social_den_o" model="denomination.fiscal.position">
             <field name="issue_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_prov_ext"/>
             <field name="receipt_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_mono_social"/>
-            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_i"/>
+            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_o"/>
         </record>
         
-        <record id="fpos_prov_ext_to_peq_contr_social" model="denomination.fiscal.position">
+        <record id="fpos_prov_ext_to_peq_contr_social_den_o" model="denomination.fiscal.position">
             <field name="issue_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_prov_ext"/>
             <field name="receipt_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_peq_contr_social"/>
-            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_i"/>
+            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_o"/>
+        </record>
+
+        <!-- ADUANA -->
+
+        <record id="fpos_aduana_to_ivari" model="denomination.fiscal.position">
+            <field name="issue_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_aduana"/>
+            <field name="receipt_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_ivari"/>
+            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_d"/>
+        </record>
+
+        <record id="fpos_aduana_to_ivanor" model="denomination.fiscal.position">
+            <field name="issue_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_aduana"/>
+            <field name="receipt_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_ivanor"/>
+            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_d"/>
+        </record>
+        
+        <record id="fpos_aduana_to_ex" model="denomination.fiscal.position">
+            <field name="issue_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_aduana"/>
+            <field name="receipt_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_ex"/>
+            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_d"/>
+        </record>
+        
+        <record id="fpos_aduana_to_cf" model="denomination.fiscal.position">
+            <field name="issue_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_aduana"/>
+            <field name="receipt_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_cf"/>
+            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_d"/>
+        </record>
+        
+        <record id="fpos_aduana_to_mon" model="denomination.fiscal.position">
+            <field name="issue_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_aduana"/>
+            <field name="receipt_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_mon"/>
+            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_d"/>
+        </record>
+        
+        <record id="fpos_aduana_to_cliente_ext" model="denomination.fiscal.position">
+            <field name="issue_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_aduana"/>
+            <field name="receipt_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_cliente_ext"/>
+            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_d"/>
+        </record>
+        
+        <record id="fpos_aduana_to_ivari_perception" model="denomination.fiscal.position">
+            <field name="issue_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_aduana"/>
+            <field name="receipt_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_ivari_perception"/>
+            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_d"/>
+        </record>
+        
+        <record id="fpos_aduana_to_peq_contr" model="denomination.fiscal.position">
+            <field name="issue_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_aduana"/>
+            <field name="receipt_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_peq_contr"/>
+            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_d"/>
+        </record>
+        
+        <record id="fpos_aduana_to_mono_social" model="denomination.fiscal.position">
+            <field name="issue_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_aduana"/>
+            <field name="receipt_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_mono_social"/>
+            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_d"/>
+        </record>
+
+        <record id="fpos_aduana_to_peq_contr_social" model="denomination.fiscal.position">
+            <field name="issue_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_aduana"/>
+            <field name="receipt_fiscal_position_id" ref="l10n_ar_afip_tables.account_fiscal_position_peq_contr_social"/>
+            <field name="account_denomination_id" ref="l10n_ar_afip_tables.account_denomination_d"/>
         </record>
 
         <!--IVA RESPONSABLE INSCRIPTO - AGENTE DE PERCEPCION-->
