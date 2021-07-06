@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="project_project_task_form">
+            <field name="name">project.project.task.form</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_form2"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='project_id']" position="before">
+                    <field name="urgency" widget="priority"/>
+                    <field name="value" widget="priority" />
+                    <field name="effort" widget="priority" />
+                </xpath>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="project_project_task_tree">
+            <field name="name">project.project.task.tree</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_tree2"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='stage_id']" position="after">
+                    <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="project_project_task_kanban">
+            <field name="name">project.project.task.kanban</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_kanban"/>
+            <field name="arch" type="xml">
+                <xpath expr="//kanban/field[@name='priority']" position="after">
+                    <field name="urgency"/>
+                    <field name="value"/>
+                    <field name="effort"/>
+                </xpath>
+
+                <div class="o_kanban_record_bottom" position="after">
+
+                    <div class="o_kanban_record_bottom">
+                        <div class="oe_kanban_bottom_left">
+                            Urgency: 
+                        </div>
+                        <div class="oe_kanban_bottom_right">
+                            <field name="urgency" widget="priority"/>
+                        </div>
+                    </div>
+                    <div class="o_kanban_record_bottom">
+                        <div class="oe_kanban_bottom_left">
+                            Value: 
+                        </div>
+                        <div class="oe_kanban_bottom_right">
+                            <field name="value" widget="priority" />
+                        </div>
+                    </div>
+                    <div class="o_kanban_record_bottom">
+                        <div class="oe_kanban_bottom_left">
+                            effort: 
+                        </div>
+
+                        <div class="oe_kanban_bottom_right">
+                            <field name="effort" widget="priority" />
+                        </div>
+                    </div>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>
